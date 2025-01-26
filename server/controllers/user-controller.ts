@@ -1,8 +1,17 @@
-const sql_database = require("../config/database-sql");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+import { Request, Response } from "express";
+import sql_database from "../config/database-sql";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-exports.register = async (req, res) => {
+interface User {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+}
+
+export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const { first_name, last_name, email, password } = req.body;
 
@@ -19,34 +28,36 @@ exports.register = async (req, res) => {
 
     res.status(201).json({ message: "User Created Successfully" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: (error as Error).message });
   }
 };
 
-exports.login = async (req, res) => {
+export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
 
-    const [rows] = await sql_database
+    const [rows]: any = await sql_database
       .promise()
       .execute("SELECT * FROM users WHERE email = ?", [email]);
 
     console.log("Query result:", rows);
 
     if (!rows || rows.length === 0) {
-      return res.status(404).json({ message: "User Not Found" });
+      res.status(404).json({ message: "User Not Found" });
+      return;
     }
 
-    const user = rows[0];
+    const user: User = rows[0];
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid Credentials" });
+      res.status(401).json({ message: "Invalid Credentials" });
+      return;
     }
 
     const token = jwt.sign(
       { id: user.id, email: user.email },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET as string,
       { expiresIn: "1h" }
     );
 
@@ -62,41 +73,51 @@ exports.login = async (req, res) => {
     });
   } catch (error) {
     console.error("Error during login:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: (error as Error).message });
   }
 };
 
-exports.getAllUsers = async (req, res) => {
+export const getAllUsers = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const query =
       "SELECT id, first_name, last_name, email, created_at FROM users";
-    const [users] = await sql_database.execute(query);
+    const [users]: any = await sql_database.execute(query);
 
     res.status(200).json({ users });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: (error as Error).message });
   }
 };
 
-exports.getUserById = async (req, res) => {
+export const getUserById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { id } = req.params;
 
     const query =
       "SELECT id, first_name, last_name, email, created_at FROM users WHERE id = ?";
-    const [user] = await sql_database.execute(query, [id]);
+    const [user]: any = await sql_database.execute(query, [id]);
 
     if (user.length === 0) {
-      return res.status(404).json({ message: "User Not Found" });
+      res.status(404).json({ message: "User Not Found" });
+      return;
     }
 
     res.status(200).json({ user: user[0] });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: (error as Error).message });
   }
 };
 
-exports.updateUser = async (req, res) => {
+export const updateUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { id } = req.params;
     const { first_name, last_name, email, password } = req.body;
@@ -107,7 +128,7 @@ exports.updateUser = async (req, res) => {
 
     const query =
       "UPDATE users SET first_name = ?, last_name = ?, email = ?, password = ? WHERE id = ?";
-    const [result] = await sql_database.execute(query, [
+    const [result]: any = await sql_database.execute(query, [
       first_name,
       last_name,
       email,
@@ -116,28 +137,33 @@ exports.updateUser = async (req, res) => {
     ]);
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "User Not Found" });
+      res.status(404).json({ message: "User Not Found" });
+      return;
     }
 
     res.status(200).json({ message: "User Updated Successfully" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: (error as Error).message });
   }
 };
 
-exports.deleteUser = async (req, res) => {
+export const deleteUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { id } = req.params;
 
     const query = "DELETE FROM users WHERE id = ?";
-    const [result] = await sql_database.execute(query, [id]);
+    const [result]: any = await sql_database.execute(query, [id]);
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "User Not Found" });
+      res.status(404).json({ message: "User Not Found" });
+      return;
     }
 
     res.status(200).json({ message: "User Deleted Successfully" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: (error as Error).message });
   }
 };

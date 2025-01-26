@@ -1,22 +1,28 @@
+import { useSelector } from "react-redux";
+import { BrowserRouter, Navigate, useRoutes } from "react-router-dom";
 import "./App.css";
-import { LoginForm } from "./pages/Login";
-// import { AppSidebar } from "./components/dashboard";
-// import { SidebarProvider } from "./components/ui/sidebar";
+import { RootState } from "./redux/store";
+import { PATH, PrivateRoutes, PublicRoutes } from "./routes";
+import { Toaster } from "sonner";
+
+const AppRouter = () => {
+  const isAuthenticated = useSelector((state: RootState) => !!state.user.token);
+  const privateRouteAuthenticated = PrivateRoutes.map((route) => {
+    return {
+      ...route,
+      element: isAuthenticated ? route.element : <Navigate to={PATH.LOGIN} />,
+    };
+  });
+  const element = useRoutes([...privateRouteAuthenticated, ...PublicRoutes]);
+  return element;
+};
 
 function App() {
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
-      <div className="w-full max-w-sm md:max-w-3xl">
-        <LoginForm />
-      </div>
-    </div>
-    // <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-    //   <div className="w-full max-w-sm">
-    //     <SidebarProvider>
-    //       <AppSidebar />
-    //     </SidebarProvider>
-    //   </div>
-    // </div>
+    <BrowserRouter key="presento">
+      <AppRouter />
+      <Toaster position="top-right" toastOptions={{ duration: 2000 }} />
+    </BrowserRouter>
   );
 }
 

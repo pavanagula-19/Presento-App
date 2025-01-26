@@ -1,39 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { loginRequest } from "../redux/slices/user-slice";
+import { registerRequest } from "../redux/slices/user-slice";
 import { RootState } from "../redux/store";
 import { useNavigate } from "react-router-dom";
-import { PATH } from "@/routes";
+import { toast } from "sonner";
 
-export function LoginForm({
+export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.user.userInfo);
   const loading = useSelector((state: RootState) => state.user.loading);
   const error = useSelector((state: RootState) => state.user.error);
   const navigate = useNavigate();
+  const [first_name, setFirstName] = useState("");
+  const [last_name, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    if (user) {
-      navigate(PATH.DASHBOARD);
-    }
-  }, [user]);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(loginRequest({ email, password }));
+    try {
+      await dispatch(
+        registerRequest({ first_name, last_name, email, password })
+      );
+      toast.success("Registration Successful");
+      navigate("/"); // Navigate to another page if needed
+    } catch (err) {
+      // Handle error if needed
+    }
   };
-  const handleRegister = () => {
-    navigate("/register");
+
+  const handleLogin = () => {
+    navigate("/");
   };
 
   return (
@@ -43,34 +47,49 @@ export function LoginForm({
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
-                <h1 className="text-2xl font-bold">Welcome back</h1>
+                <h1 className="text-2xl font-bold">Create an Account</h1>
                 <p className="text-balance text-muted-foreground">
-                  Login to your Presento account
+                  Sign up for your Presento account
                 </p>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  type="text"
+                  placeholder="first name"
+                  value={first_name}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  type="text"
+                  placeholder="last name"
+                  value={last_name}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
-                  >
-                    Forgot password?
-                  </a>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
+                  placeholder="**********"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -78,18 +97,17 @@ export function LoginForm({
                 />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Logging in..." : "Login"}
+                {loading ? "Registering..." : "Register"}
               </Button>
               {error && <p className="text-red-500">{error}</p>}
-
               <div className="text-center text-sm">
-                Don&apos;t have an account?{" "}
+                Already have an account?{" "}
                 <a
                   href="#"
                   className="underline underline-offset-4"
-                  onClick={handleRegister}
+                  onClick={handleLogin}
                 >
-                  Sign up
+                  Login
                 </a>
               </div>
             </div>
