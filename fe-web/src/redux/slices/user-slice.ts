@@ -15,6 +15,18 @@ interface UserState {
   error: string | null;
 }
 
+interface RegisterPayload {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+}
+
+interface LoginPayload {
+  email: string;
+  password: string;
+}
+
 const initialState: UserState = {
   userInfo: null,
   token: null,
@@ -27,7 +39,7 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    registerRequest(state) {
+    registerRequest(state, action: PayloadAction<RegisterPayload>) {
       state.loading = true;
       state.error = null;
     },
@@ -39,7 +51,7 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    loginRequest(state) {
+    loginRequest(state, action: PayloadAction<LoginPayload>) {
       state.loading = true;
       state.error = null;
     },
@@ -47,6 +59,7 @@ const userSlice = createSlice({
       state.loading = false;
       state.userInfo = action.payload.user;
       state.token = action.payload.token;
+      localStorage.setItem("token", action.payload.token);
     },
     loginFailure(state, action: PayloadAction<string>) {
       state.loading = false;
@@ -88,6 +101,11 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+    logout(state) {
+      state.userInfo = null;
+      state.token = null;
+      localStorage.removeItem("token");
+    },
   },
 });
 
@@ -107,6 +125,7 @@ export const {
   deleteUserRequest,
   deleteUserSuccess,
   deleteUserFailure,
+  logout,
 } = userSlice.actions;
 
 export default userSlice.reducer;

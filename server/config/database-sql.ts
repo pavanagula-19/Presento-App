@@ -1,7 +1,9 @@
-const mysql = require("mysql2");
-require("dotenv").config();
+import mysql, { Pool, PoolConnection } from "mysql2";
+import dotenv from "dotenv";
 
-const pool = mysql.createPool({
+dotenv.config();
+
+const pool: Pool = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.MYSQLPASSWORD,
@@ -11,7 +13,7 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
-pool.getConnection((err, connection) => {
+pool.getConnection((err: any, connection: PoolConnection | null) => {
   if (err) {
     console.error("MySQL Connection Error:", err.message);
 
@@ -35,9 +37,8 @@ pool.getConnection((err, connection) => {
 
   if (connection) {
     console.log("MySQL Connected Successfully");
-
     connection.release();
   }
 });
 
-module.exports = pool;
+export default pool;

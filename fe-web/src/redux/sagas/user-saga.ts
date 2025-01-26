@@ -44,7 +44,7 @@ interface UpdateUserResponse {
   user: User;
 }
 
-function* registerUser({payload}: PayloadAction<User>) {
+function* registerUser({ payload }: PayloadAction<User>) {
   try {
     const response: AxiosResponse<RegisterResponse> = yield call(
       axios.post,
@@ -59,7 +59,7 @@ function* registerUser({payload}: PayloadAction<User>) {
   }
 }
 
-function* loginUser({payload}: PayloadAction<User>) {
+function* loginUser({ payload }: PayloadAction<User>) {
   try {
     const response: AxiosResponse<LoginResponse> = yield call(
       axios.post,

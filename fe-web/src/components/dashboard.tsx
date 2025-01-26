@@ -1,167 +1,54 @@
-"use client";
-
-import * as React from "react";
 import {
-  LibraryBig,
-  BookOpen,
-  Frame,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Overview } from "@/components/overview";
+import { RecentSales } from "@/components/recent-sales";
+import { Search } from "@/components/search";
 
-import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
-import { NavUser } from "@/components/nav-user";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarRail,
-} from "@/components/ui/sidebar";
-import { ScrollArea } from "./ui/scroll-area";
-import { Avatar, AvatarImage } from "./ui/avatar";
-
-// This is sample data.
-const data = {
-  user: {
-    name: "Pavan",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Notes",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "Create Notes",
-          url: "#",
-        },
-        {
-          title: "Shared with me",
-          url: "#",
-        },
-        {
-          title: "View Notes",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Books",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Create Book",
-          url: "#",
-        },
-        {
-          title: "Manage Books",
-          url: "#",
-        },
-        {
-          title: "Publish Book",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Library",
-      url: "#",
-      icon: LibraryBig,
-      items: [
-        {
-          title: "Wishlist",
-          url: "#",
-        },
-        {
-          title: "Search Books",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
-};
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export default function DashboardPage() {
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <header className="flex items-center justify-between bg-gray-800 text-white p-4">
-        <div className="flex items-center gap-5 space-x-2">
-          <div className="h-8 w-8 bg-gray-300 rounded-md flex items-center justify-center">
-            <span className="text-sm text-gray-600">
-              <Avatar className="rounded-md">
-                <AvatarImage src="https://ik.imagekit.io/pavanagulla19/elephant.jpg?updatedAt=1737743253686" />
-              </Avatar>
-            </span>
+    <div className="w-full h-full flex flex-col">
+      <div className="border-b w-full">
+        <div className="flex h-16 w-full items-center justify-between px-4">
+          <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+          <div className="flex items-center space-x-4">
+            <Search />
           </div>
-          <h1 className="text-2xl font-bold">Presento</h1>
         </div>
-      </header>
-
-      <SidebarContent>
-        <ScrollArea className="max-w-[90vh]">
-          <NavMain items={data.navMain} />
-          <NavProjects projects={data.projects} />
-        </ScrollArea>
-      </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
-    </Sidebar>
+      </div>
+      <div className="flex-1 space-y-4 p-8 pt-6 w-full">
+        <div className="flex items-center justify-between space-y-2 w-full"></div>
+        <Tabs defaultValue="overview" className="space-y-4 w-full">
+          <TabsContent value="overview" className="space-y-4 w-full">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7 w-full">
+              <Card className="col-span-4">
+                <CardHeader>
+                  <CardTitle>Overview</CardTitle>
+                </CardHeader>
+                <CardContent className="pl-2">
+                  <Overview />
+                </CardContent>
+              </Card>
+              <Card className="col-span-3">
+                <CardHeader>
+                  <CardTitle>Recent Sales</CardTitle>
+                  <CardDescription>
+                    You made 265 sales this month.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <RecentSales />
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
   );
 }
