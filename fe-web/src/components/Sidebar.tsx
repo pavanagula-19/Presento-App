@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
+import { NavProjects } from "@/components/projects/NavProjects";
 import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
@@ -42,7 +42,7 @@ const data = {
         },
         {
           title: "Shared with me",
-          url: "#",
+          url: PATH.SHAREDNOTES,
         },
       ],
     },
@@ -52,15 +52,15 @@ const data = {
       items: [
         {
           title: "Create Book",
-          url: "#",
+          url: PATH.CREATEBOOK,
         },
         {
           title: "Manage Books",
-          url: "#",
+          url: PATH.MANAGEBOOK,
         },
         {
           title: "Publish Book",
-          url: "#",
+          url: PATH.PUBLISHBOOK,
         },
       ],
     },
@@ -74,7 +74,7 @@ const data = {
         },
         {
           title: "Search Books",
-          url: "#",
+          url: PATH.SEARCHBOOKS,
         },
         {
           title: "Tutorials",

@@ -21,6 +21,25 @@ import { PayloadAction } from "@reduxjs/toolkit";
 
 const API_URL = "http://localhost:8000/api/user";
 
+// Create an Axios instance
+const apiClient = axios.create({
+  baseURL: API_URL,
+});
+
+// Add a request interceptor to include the token
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 interface User {
   id: string;
   name: string;
@@ -47,8 +66,8 @@ interface UpdateUserResponse {
 function* registerUser({ payload }: PayloadAction<User>) {
   try {
     const response: AxiosResponse<RegisterResponse> = yield call(
-      axios.post,
-      `${API_URL}/register`,
+      apiClient.post,
+      `/register`,
       payload
     );
     yield put(registerSuccess(response.data.user));
@@ -62,10 +81,11 @@ function* registerUser({ payload }: PayloadAction<User>) {
 function* loginUser({ payload }: PayloadAction<User>) {
   try {
     const response: AxiosResponse<LoginResponse> = yield call(
-      axios.post,
-      `${API_URL}/login`,
+      apiClient.post,
+      `/login`,
       payload
     );
+    localStorage.setItem("authToken", response.data.token);
     yield put(loginSuccess(response.data));
   } catch (error: any) {
     yield put(
@@ -77,8 +97,8 @@ function* loginUser({ payload }: PayloadAction<User>) {
 function* fetchUsers() {
   try {
     const response: AxiosResponse<FetchUsersResponse> = yield call(
-      axios.get,
-      API_URL
+      apiClient.get,
+      `/`
     );
     yield put(fetchUsersSuccess(response.data.users));
   } catch (error: any) {
@@ -92,8 +112,8 @@ function* updateUser({ payload }: PayloadAction<User>) {
   try {
     const { id, ...data } = payload;
     const response: AxiosResponse<UpdateUserResponse> = yield call(
-      axios.put,
-      `${API_URL}/${id}`,
+      apiClient.put,
+      `/${id}`,
       data
     );
     yield put(updateUserSuccess(response.data.user));
@@ -106,7 +126,7 @@ function* updateUser({ payload }: PayloadAction<User>) {
 
 function* deleteUser({ payload }: PayloadAction<string>) {
   try {
-    yield call(axios.delete, `${API_URL}/${payload}`);
+    yield call(apiClient.delete, `/${payload}`);
     yield put(deleteUserSuccess(payload));
   } catch (error: any) {
     yield put(

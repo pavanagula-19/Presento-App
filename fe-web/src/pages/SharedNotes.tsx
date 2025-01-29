@@ -1,23 +1,22 @@
-import  { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   ColumnDef,
-  SortingState,
-  useReactTable,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
   ColumnFiltersState,
+  SortingState,
   VisibilityState,
   flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
 } from "@tanstack/react-table";
 import {
   ArrowUpDown,
+  Ellipsis,
   MoreHorizontal,
   Share,
-  Star,
-  StarOff,
   Trash2,
 } from "lucide-react";
 
@@ -41,67 +40,45 @@ import {
 } from "@/components/ui/table";
 
 import {
-  selectNotes,
-  selectNoteLoading,
-  selectNoteError,
-} from "@/redux/selectors/note-selector";
-import {
-  fetchNotesRequest,
-  updateNoteRequest,
-} from "@/redux/slices/note-slice";
+  selectSharedNoteError,
+  selectSharedNoteLoading,
+  selectSharedNotes,
+} from "@/redux/selectors/share-note-selector";
+import { fetchSharedNotesRequest } from "@/redux/slices/share-note-slice";
 import { selectUserInfo } from "@/redux/selectors/user-selector";
-import { createSharedNoteRequest } from "@/redux/slices/share-note-slice";
 import NoteDetail from "./NotesDetails";
-import SharePopover from "./sharePop";
 
-export type Notes = {
-  id: string;
-  wishlist: boolean;
-  title: string;
-  subject: string;
-  content: string;
+export type SharedNote = {
+    id: string; 
+    noteId: string;
+    sharedWith: string; 
+    sharedBy: string; 
 };
 
-export default function ViewNotes() {
+export default function SharedNotes() {
   const dispatch = useDispatch();
-  const notes = useSelector(selectNotes);
-  const loading = useSelector(selectNoteLoading);
-  const error = useSelector(selectNoteError);
+  const sharedNotes = useSelector(selectSharedNotes);
+  const loading = useSelector(selectSharedNoteLoading);
+  const error = useSelector(selectSharedNoteError);
   const user = useSelector(selectUserInfo);
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [selectedNote, setSelectedNote] = useState<Notes | null>(null);
-  const [showSharePopover, setShowSharePopover] = useState(false);
-  const [noteToShare, setNoteToShare] = useState<string | null>(null);
-  const [rowSelection, setRowSelection] = useState({});
 
-  useEffect(() => {
+  const [selectedNote, setSelectedNote] = useState<SharedNote | null>(null);
+
+  React.useEffect(() => {
     if (user?.id) {
-      dispatch(fetchNotesRequest(user.id));
+      dispatch(fetchSharedNotesRequest(user._id));
     }
   }, [dispatch, user]);
 
-  const handleShare = (email: string) => {
-    if (noteToShare) {
-      dispatch(
-        createSharedNoteRequest({ noteId: noteToShare, sharedWith: email })
-      );
-      setShowSharePopover(false);
-    }
-  };
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
-  const handleOpenSharePopover = (noteId: string) => {
-    setNoteToShare(noteId);
-    setShowSharePopover(true);
-  };
-
-  const handleCloseSharePopover = () => {
-    setShowSharePopover(false);
-    setNoteToShare(null);
-  };
-
-  const columns: ColumnDef<Notes>[] = [
+  const columns: ColumnDef<SharedNote>[] = [
     {
       id: "sno",
       header: "S.No",
@@ -123,43 +100,27 @@ export default function ViewNotes() {
     },
     {
       accessorKey: "subject",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Subject
-          <ArrowUpDown />
-        </Button>
-      ),
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Subject
+            <ArrowUpDown />
+          </Button>
+        );
+      },
       cell: ({ row }) => (
         <div className="lowercase">{row.getValue("subject")}</div>
       ),
     },
     {
-      accessorKey: "wishlist",
-      header: () => <div className="text-right">Wishlist</div>,
-      cell: ({ row }) => {
-        const isWishlist = row.original.wishlist;
-
-        const toggleWishlist = () => {
-          const updatedWishlistStatus = !isWishlist;
-          dispatch(
-            updateNoteRequest({
-              ...row.original,
-              wishlist: updatedWishlistStatus,
-            })
-          );
-        };
-
-        return (
-          <div className="text-right">
-            <Button variant="ghost" onClick={toggleWishlist}>
-              {isWishlist ? <Star className="text-yellow-500" /> : <StarOff />}
-            </Button>
-          </div>
-        );
-      },
+      accessorKey: "sharedWith",
+      header: () => <div className="text-right">Shared With</div>,
+      cell: ({ row }) => (
+        <div className="text-right">{row.getValue("sharedWith")}</div>
+      ),
     },
     {
       id: "actions",
@@ -177,12 +138,15 @@ export default function ViewNotes() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleOpenSharePopover(note.id)}>
+              <DropdownMenuItem
+                onClick={() => navigator.clipboard.writeText(note.id)}
+              >
                 <Share />
                 Share Notes
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <span>View details</span>
+                <Ellipsis />
+                View details
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-red-500">
@@ -197,7 +161,7 @@ export default function ViewNotes() {
   ];
 
   const table = useReactTable({
-    data: notes,
+    data: sharedNotes,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -223,21 +187,14 @@ export default function ViewNotes() {
     return <div>Error: {error}</div>;
   }
 
-  if (selectedNote) {
-    return (
-      <NoteDetail note={selectedNote} onClose={() => setSelectedNote(null)} />
-    );
-  }
+  // if (selectedNote) {
+  //   return (
+  //     <NoteDetail note={selectedNote} onClose={() => setSelectedNote(null)} />
+  //   );
+  // }
 
   return (
     <div className="w-full">
-      {showSharePopover && noteToShare && (
-        <SharePopover
-          noteId={noteToShare}
-          onClose={handleCloseSharePopover}
-          onShare={handleShare}
-        />
-      )}
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter Subjects..."
@@ -253,16 +210,18 @@ export default function ViewNotes() {
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
             ))}
           </TableHeader>
