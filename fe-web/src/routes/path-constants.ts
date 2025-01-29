@@ -3,5 +3,13 @@ export const PATH = {
   REGISTRATION: "/register",
   DASHBOARD: "/dashboard",
   CREATENOTES: "/create-notes",
-  VIEWNOTES: "/view-notes"
+  VIEWNOTES: "/view-notes",
+  SHAREDNOTES: "/shared-notes",
+  CREATEBOOK: "/create-book",
+  MANAGEBOOK: "/manage-book",
+  PUBLISHBOOK: "/publish-book",
+  SEARCHBOOKS: "/search-books",
+  CREATEPROJECTS: "/create-project",
+  CREATEPLANNING: "/create-planning",
+  MANAGEPROJECTS: "/manage-projects",
 };
