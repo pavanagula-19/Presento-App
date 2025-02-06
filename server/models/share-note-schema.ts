@@ -2,8 +2,8 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface ISharedNote extends Document {
   noteId: string;
-  sharedWith: string; 
-  sharedBy: string; 
+  sharedWith: string;
+  sharedBy: string;
   createdAt: Date;
 }
 

@@ -16,11 +16,6 @@ import {
 import axios, { AxiosResponse } from "axios";
 import { PayloadAction } from "@reduxjs/toolkit";
 
-interface DeleteNoteAction {
-  type: string;
-  payload: string;
-}
-
 function* fetchNotesSaga({ payload }: PayloadAction<string>) {
   try {
     const response: AxiosResponse<any> = yield call(
@@ -33,8 +28,7 @@ function* fetchNotesSaga({ payload }: PayloadAction<string>) {
   }
 }
 
-function* createNoteSaga({ payload }: any) {
-  console.log("Payload sent to server:", payload);
+function* createNoteSaga({ payload }: PayloadAction<any>) {
   try {
     const response: AxiosResponse<any> = yield call(
       axios.post,
@@ -47,11 +41,11 @@ function* createNoteSaga({ payload }: any) {
   }
 }
 
-function* updateNoteSaga({ payload }: any) {
+function* updateNoteSaga({ payload }: PayloadAction<any>) {
   try {
     const response: AxiosResponse<any> = yield call(
       axios.put,
-      `http://localhost:8000/api/notes/${payload._id}`,
+      `http://localhost:8000/api/notes/${payload.noteId}`,
       payload
     );
     yield put(updateNoteSuccess(response.data.note));
@@ -60,13 +54,10 @@ function* updateNoteSaga({ payload }: any) {
   }
 }
 
-function* deleteNoteSaga(action: DeleteNoteAction): Generator<any, void, void> {
+function* deleteNoteSaga({ payload }: PayloadAction<string>) {
   try {
-    yield call(
-      axios.delete,
-      `http://localhost:8000/api/notes/${action.payload}`
-    );
-    yield put(deleteNoteSuccess(action.payload));
+    yield call(axios.delete, `http://localhost:8000/api/notes/${payload}`);
+    yield put(deleteNoteSuccess(payload));
   } catch (error: any) {
     yield put(deleteNoteFailure(error.message));
   }

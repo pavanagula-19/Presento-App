@@ -17,6 +17,10 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
+import { PATH } from "@/routes";
+import { useDispatch } from "react-redux";
+import { saveCurrentNoteId } from "@/redux/slices/note-slice";
+import { useTheme } from "./themed-context";
 
 export function NavMain({
   items,
@@ -32,35 +36,61 @@ export function NavMain({
   }[];
 }) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { theme } = useTheme();
+
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel
+        className={
+          theme === "dark" ? " bg-black text-gray-300" : "bg-white text-black"
+        }
+      >
+        Platform
+      </SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible
             key={item.title}
             asChild
             defaultOpen={item.isActive}
-            className="group/collapsible"
+            className="group/collapsible flex flex-col gap-2"
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  className={`flex items-center justify-between w-full p-2 rounded-md transition-colors duration-200 ${
+                    theme === "dark"
+                      ? "bg-gray-800 hover:bg-gray-800 text-white hover:text-white"
+                      : "bg-white text-black hover:bg-gray-100"
+                  }`}
+                >
+                  {item.icon && <item.icon className="mr-2" />}
                   <span>{item.title}</span>
-                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                  <ChevronRight
+                    className={`ml-auto transition-transform duration-200 ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-600"
+                    } group-data-[state=open]/collapsible:rotate-90`}
+                  />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <SidebarMenuSub>
+                <SidebarMenuSub className="flex flex-col gap-2">
                   {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem
-                      key={subItem.title}
-                      className="cursor-pointer"
-                    >
+                    <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton
                         asChild
-                        onClick={() => navigate(subItem?.url)}
+                        onClick={() => {
+                          subItem?.url === PATH.CREATENOTES &&
+                            dispatch(saveCurrentNoteId(undefined));
+                          navigate(subItem?.url);
+                        }}
+                        className={`flex items-center w-full p-2 rounded-md transition-colors duration-200 ${
+                          theme === "dark"
+                            ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                            : "bg-gray-200 text-black hover:bg-gray-300"
+                        }`}
                       >
                         <span>{subItem.title}</span>
                       </SidebarMenuSubButton>

@@ -4,6 +4,7 @@ import "./App.css";
 import { RootState } from "./redux/store";
 import { PATH, PrivateRoutes, PublicRoutes } from "./routes";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "./components/themed-context";
 
 const AppRouter = () => {
   const isAuthenticated = useSelector((state: RootState) => !!state.user.token);
@@ -19,10 +20,12 @@ const AppRouter = () => {
 
 function App() {
   return (
-    <BrowserRouter key="presento">
-      <AppRouter />
-      <Toaster position="top-right" toastOptions={{ duration: 2000 }} />
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter key="presento">
+        <AppRouter />
+        <Toaster position="top-right" toastOptions={{ duration: 2000 }} />
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

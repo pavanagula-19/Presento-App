@@ -1,4 +1,3 @@
-
 import express, { Router } from "express";
 import {
   createSharedNote,
@@ -10,7 +9,7 @@ import { authenticate } from "../middleware/authenticate";
 const router: Router = express.Router();
 
 router.post("/", authenticate, createSharedNote);
-router.get("/:userId", authenticate, getSharedNotes);
+router.get("/", authenticate, getSharedNotes);
 router.delete("/:id", authenticate, deleteSharedNote);
 
 export default router;

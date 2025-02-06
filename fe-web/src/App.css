@@ -1,7 +1,11 @@
 #root {
   margin: 0 auto;
+  cursor: cursorPointer;
 }
-
+.cursor-pointer-custom {
+  cursor: url("https://ik.imagekit.io/pavanagulla19/cursor-lucide.png?updatedAt=1737826320759"),
+    pointer;
+}
 .logo {
   height: 6em;
   padding: 1.5em;

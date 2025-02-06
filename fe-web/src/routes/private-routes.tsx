@@ -5,12 +5,11 @@ import { PrivateLayout } from "../layouts";
 import { PATH } from "./path-constants";
 import ViewNotes from "@/pages/ViewNotes";
 import SharedNotes from "@/pages/SharedNotes";
-import CreateBook from "@/pages/CreateBook";
-import ManageBook from "@/pages/ManageBook";
-import PublishBook from "@/pages/PublishBook";
 import LibraryBooksSearch from "@/pages/LibraryBooksSearch";
 import { ManageProjects } from "@/components/projects/ManageProjects";
-import  CreatePlanning  from "@/components/projects/CreatePlanning";
+import CreatePlanning from "@/components/projects/CreatePlanning";
+import BookReader from "@/components/BookReader";
+import BooksWishList from "@/pages/BooksWishlist";
 export const PrivateRoutes: RouteObject[] = [
   {
     index: true,
@@ -52,33 +51,6 @@ export const PrivateRoutes: RouteObject[] = [
     index: true,
     element: (
       <PrivateLayout>
-        <CreateBook />
-      </PrivateLayout>
-    ),
-    path: PATH.CREATEBOOK,
-  },
-  {
-    index: true,
-    element: (
-      <PrivateLayout>
-        <ManageBook />
-      </PrivateLayout>
-    ),
-    path: PATH.MANAGEBOOK,
-  },
-  {
-    index: true,
-    element: (
-      <PrivateLayout>
-        <PublishBook />
-      </PrivateLayout>
-    ),
-    path: PATH.PUBLISHBOOK,
-  },
-  {
-    index: true,
-    element: (
-      <PrivateLayout>
         <LibraryBooksSearch />
       </PrivateLayout>
     ),
@@ -101,5 +73,23 @@ export const PrivateRoutes: RouteObject[] = [
       </PrivateLayout>
     ),
     path: PATH.CREATEPLANNING,
+  },
+  {
+    index: true,
+    element: (
+      <PrivateLayout>
+        <BookReader />
+      </PrivateLayout>
+    ),
+    path: PATH.BOOKREADER,
+  },
+  {
+    index: true,
+    element: (
+      <PrivateLayout>
+        <BooksWishList />
+      </PrivateLayout>
+    ),
+    path: PATH.BOOKWISHLIST,
   },
 ];

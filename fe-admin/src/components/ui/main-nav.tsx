@@ -1,5 +1,7 @@
-import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
+
+import { cn } from "@/lib/utils";
+import { PATH } from "@/routes/path-constants";
 
 export function MainNav({
   className,
@@ -11,25 +13,25 @@ export function MainNav({
       {...props}
     >
       <Link
-        to="/examples/dashboard"
+        to={PATH.DASHBOARD}
         className="text-sm font-medium transition-colors hover:text-primary"
       >
         Overview
       </Link>
       <Link
-        to="/examples/dashboard"
+        to={PATH.CUSTOMERS}
         className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
       >
         Customers
       </Link>
       <Link
-        to="/examples/dashboard"
+        to={PATH.PRODUCTS}
         className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
       >
         Products
       </Link>
       <Link
-        to="/examples/dashboard"
+        to={PATH.SETTINGS}
         className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
       >
         Settings

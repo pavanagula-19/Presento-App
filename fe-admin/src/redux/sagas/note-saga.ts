@@ -1,0 +1,71 @@
+import { takeLatest, call, put } from "redux-saga/effects";
+import {
+  fetchNotesRequest,
+  fetchNotesSuccess,
+  fetchNotesFailure,
+  createNoteRequest,
+  createNoteSuccess,
+  createNoteFailure,
+  updateNoteRequest,
+  updateNoteSuccess,
+  updateNoteFailure,
+  deleteNoteRequest,
+  deleteNoteSuccess,
+  deleteNoteFailure,
+} from "../slices/note-slice";
+import axios, { AxiosResponse } from "axios";
+import { PayloadAction } from "@reduxjs/toolkit";
+
+function* fetchNotesSaga({ payload }: PayloadAction<string>) {
+  try {
+    const response: AxiosResponse<any> = yield call(
+      axios.get,
+      `http://localhost:8000/api/notes/${payload}`
+    );
+    yield put(fetchNotesSuccess(response.data.notes));
+  } catch (error: any) {
+    yield put(fetchNotesFailure(error.message));
+  }
+}
+
+function* createNoteSaga({ payload }: PayloadAction<any>) {
+  try {
+    const response: AxiosResponse<any> = yield call(
+      axios.post,
+      "http://localhost:8000/api/notes",
+      payload
+    );
+    yield put(createNoteSuccess(response.data.note));
+  } catch (error: any) {
+    yield put(createNoteFailure(error.message));
+  }
+}
+
+function* updateNoteSaga({ payload }: PayloadAction<any>) {
+  try {
+    const response: AxiosResponse<any> = yield call(
+      axios.put,
+      `http://localhost:8000/api/notes/${payload.id}`,
+      payload
+    );
+    yield put(updateNoteSuccess(response.data.note));
+  } catch (error: any) {
+    yield put(updateNoteFailure(error.message));
+  }
+}
+
+function* deleteNoteSaga({ payload }: PayloadAction<string>) {
+  try {
+    yield call(axios.delete, `http://localhost:8000/api/notes/${payload}`);
+    yield put(deleteNoteSuccess(payload));
+  } catch (error: any) {
+    yield put(deleteNoteFailure(error.message));
+  }
+}
+
+export default function* noteSagas() {
+  yield takeLatest(fetchNotesRequest.type, fetchNotesSaga);
+  yield takeLatest(createNoteRequest.type, createNoteSaga);
+  yield takeLatest(updateNoteRequest.type, updateNoteSaga);
+  yield takeLatest(deleteNoteRequest.type, deleteNoteSaga);
+}
