@@ -27,12 +27,11 @@ interface SharedNote {
   createdAt: Date;
 }
 
-function* fetchSharedNotesSaga(action: PayloadAction<string>) {
+function* fetchSharedNotesSaga() {
   try {
-    const userId = action.payload;
     const response: AxiosResponse<{ sharedNotes: SharedNote[] }> = yield call(
       apiClient.get,
-      `/shared/notes/${userId}`
+      "/shared/notes"
     );
     yield put(fetchSharedNotesSuccess(response.data.sharedNotes));
   } catch (error: any) {

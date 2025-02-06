@@ -13,17 +13,20 @@ interface User {
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { first_name, last_name, email, password } = req.body;
+    const { first_name, last_name, email, password, role } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const query =
-      "INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)";
+    const query = `
+      INSERT INTO users (first_name, last_name, email, password, role) 
+      VALUES (?, ?, ?, ?, ?)
+    `;
     await sql_database.execute(query, [
       first_name,
       last_name,
       email,
       hashedPassword,
+      role || "user", // Default to 'user' if no role is provided
     ]);
 
     res.status(201).json({ message: "User Created Successfully" });
@@ -120,19 +123,23 @@ export const updateUser = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const { first_name, last_name, email, password } = req.body;
+    const { first_name, last_name, email, password, role } = req.body;
 
     const hashedPassword = password
       ? await bcrypt.hash(password, 10)
       : undefined;
 
-    const query =
-      "UPDATE users SET first_name = ?, last_name = ?, email = ?, password = ? WHERE id = ?";
+    const query = `
+      UPDATE users 
+      SET first_name = ?, last_name = ?, email = ?, password = ?, role = ?
+      WHERE id = ?
+    `;
     const [result]: any = await sql_database.execute(query, [
       first_name,
       last_name,
       email,
       hashedPassword || null,
+      role || "user",
       id,
     ]);
 

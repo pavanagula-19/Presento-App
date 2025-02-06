@@ -75,7 +75,7 @@ export const updateNote = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const { title,  subject, wishlist, content } = req.body;
+    const { title, subject, wishlist, content } = req.body;
 
     const updatedNote = await Note.findByIdAndUpdate(
       id,

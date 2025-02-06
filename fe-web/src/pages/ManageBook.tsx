@@ -1,13 +1,5 @@
 import { Search } from "@/components/search";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Image } from "lucide-react";
 import { useState } from "react";
 
@@ -38,7 +30,7 @@ function CustomPagination({
         <button
           key={index}
           className={`px-3 py-1 ${
-            currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+            currentPage === index + 1 ? "bg-black text-white" : "bg-gray-200"
           }`}
           onClick={() => onPageChange(index + 1)}
         >
@@ -66,23 +58,31 @@ export default function ManageBook() {
       <div className="flex justify-center mb-6">
         <Search />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {currentBooks.map((book, index) => (
-          <Card key={index} className="w-full">
-            <CardHeader>
-              <CardTitle>{book.title}</CardTitle>
-              <CardDescription>
-                <div className="flex justify-center">
-                  <Image />
-                </div>
-              </CardDescription>
-            </CardHeader>
-            <CardContent>{book.author}</CardContent>
-            <CardFooter className="flex justify-between">
-              <Button>Open</Button>
-            </CardFooter>
-          </Card>
-        ))}
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white shadow-md rounded-lg">
+          <thead>
+            <tr>
+              <th className="py-2 px-4 border-b text-left">Title</th>
+              <th className="py-2 px-4 border-b text-left">Author</th>
+              <th className="py-2 px-4 border-b text-center">Image</th>
+              <th className="py-2 px-4 border-b text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentBooks.map((book, index) => (
+              <tr key={index} className="hover:bg-gray-100">
+                <td className="py-2 px-4 border-b">{book.title}</td>
+                <td className="py-2 px-4 border-b">{book.author}</td>
+                <td className="py-2 px-4 border-b text-center">
+                  <Image className="w-6 h-6 mx-auto" />
+                </td>
+                <td className="py-2 px-4 border-b text-center">
+                  <Button>Open</Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
       <div className="flex justify-center mt-6">
         <CustomPagination

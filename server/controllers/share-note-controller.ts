@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import SharedNote, { ISharedNote } from "../models/share-note-schema";
 import pool from "../config/database-sql";
 import { RowDataPacket } from "mysql2";
-import { AuthenticatedRequest } from "../middleware/authenticate";
+import { AuthenticatedRequest } from "../config/types";
 
 export const createSharedNote = async (
   req: AuthenticatedRequest,
@@ -17,8 +17,6 @@ export const createSharedNote = async (
     }
 
     const sharedBy = req.user.id;
-
-    console.log("Attempting to share note with:", sharedWith);
 
     const [rows] = await pool
       .promise()
@@ -49,13 +47,18 @@ export const createSharedNote = async (
 };
 
 export const getSharedNotes = async (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
   try {
-    const { email } = req.params;
+    if (!req.user || !req.user.email) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
 
-    const sharedNotes = await SharedNote.find({ sharedWith: email });
+    const email = req.user.email;
+
+    const sharedNotes = await SharedNote.find({ sharedBy: email });
 
     if (sharedNotes.length === 0) {
       res.status(200).json({ sharedNotes: [] });
@@ -89,7 +92,7 @@ export const getSharedNotes = async (
 };
 
 export const deleteSharedNote = async (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response
 ): Promise<void> => {
   try {

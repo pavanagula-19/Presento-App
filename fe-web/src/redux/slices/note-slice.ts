@@ -1,15 +1,18 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../store";
 
 interface NoteState {
   notes: any[];
   loading: boolean;
   error: string | null;
+  noteId?: string;
 }
 
 const initialState: NoteState = {
   notes: [],
   loading: false,
   error: null,
+  noteId: undefined,
 };
 
 const noteSlice = createSlice({
@@ -39,14 +42,13 @@ const noteSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    updateNoteRequest: (state,_action: PayloadAction<any> ) => {
-      
+    updateNoteRequest: (state, _action: PayloadAction<any>) => {
       state.loading = true;
     },
     updateNoteSuccess: (state, action: PayloadAction<any>) => {
       state.loading = false;
       const index = state.notes.findIndex(
-        (note) => note.id === action.payload.id
+        (note) => note._id === action.payload?._id
       );
       if (index !== -1) {
         state.notes[index] = action.payload;
@@ -56,16 +58,19 @@ const noteSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    deleteNoteRequest: (state) => {
+    deleteNoteRequest: (state, _action: PayloadAction<string>) => {
       state.loading = true;
     },
     deleteNoteSuccess: (state, action: PayloadAction<string>) => {
       state.loading = false;
-      state.notes = state.notes.filter((note) => note.id !== action.payload);
+      state.notes = state.notes.filter((note) => note._id !== action.payload);
     },
     deleteNoteFailure: (state, action: PayloadAction<string>) => {
       state.loading = false;
       state.error = action.payload;
+    },
+    saveCurrentNoteId(state, action: PayloadAction<string | undefined>) {
+      return { ...state, noteId: action.payload };
     },
   },
 });
@@ -83,6 +88,7 @@ export const {
   deleteNoteRequest,
   deleteNoteSuccess,
   deleteNoteFailure,
+  saveCurrentNoteId,
 } = noteSlice.actions;
 
 export default noteSlice.reducer;

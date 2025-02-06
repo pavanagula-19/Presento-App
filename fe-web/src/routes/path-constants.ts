@@ -5,11 +5,10 @@ export const PATH = {
   CREATENOTES: "/create-notes",
   VIEWNOTES: "/view-notes",
   SHAREDNOTES: "/shared-notes",
-  CREATEBOOK: "/create-book",
-  MANAGEBOOK: "/manage-book",
-  PUBLISHBOOK: "/publish-book",
   SEARCHBOOKS: "/search-books",
   CREATEPROJECTS: "/create-project",
   CREATEPLANNING: "/create-planning",
   MANAGEPROJECTS: "/manage-projects",
+  BOOKREADER: "/book-reader",
+  BOOKWISHLIST: "/books-wishlist",
 };

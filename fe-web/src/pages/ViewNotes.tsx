@@ -1,4 +1,4 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   ColumnDef,
@@ -14,6 +14,7 @@ import {
 } from "@tanstack/react-table";
 import {
   ArrowUpDown,
+  Ellipsis,
   MoreHorizontal,
   Share,
   Star,
@@ -46,6 +47,7 @@ import {
   selectNoteError,
 } from "@/redux/selectors/note-selector";
 import {
+  deleteNoteRequest,
   fetchNotesRequest,
   updateNoteRequest,
 } from "@/redux/slices/note-slice";
@@ -53,9 +55,16 @@ import { selectUserInfo } from "@/redux/selectors/user-selector";
 import { createSharedNoteRequest } from "@/redux/slices/share-note-slice";
 import NoteDetail from "./NotesDetails";
 import SharePopover from "./sharePop";
+import { Spinner } from "@/components/spinner";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@radix-ui/react-popover";
+import { useTheme } from "../components/themed-context";
 
 export type Notes = {
-  id: string;
+  _id: string;
   wishlist: boolean;
   title: string;
   subject: string;
@@ -64,23 +73,47 @@ export type Notes = {
 
 export default function ViewNotes() {
   const dispatch = useDispatch();
-  const notes = useSelector(selectNotes);
+  const notes: Notes[] = useSelector(selectNotes);
   const loading = useSelector(selectNoteLoading);
   const error = useSelector(selectNoteError);
   const user = useSelector(selectUserInfo);
+
+  const { theme } = useTheme();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [selectedNote, setSelectedNote] = useState<Notes | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+
   const [showSharePopover, setShowSharePopover] = useState(false);
   const [noteToShare, setNoteToShare] = useState<string | null>(null);
   const [rowSelection, setRowSelection] = useState({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const handleEdit = (note: Notes) => {
+    setSelectedNote(note);
+    setIsEditing(true);
+  };
+  useEffect(() => {
+    if (notes) {
+      setIsLoading(false);
+    }
+  }, [notes]);
 
   useEffect(() => {
     if (user?.id) {
       dispatch(fetchNotesRequest(user.id));
     }
   }, [dispatch, user]);
+
+  const handleDelete = (noteId: string) => {
+    if (noteId) {
+      setIsLoading(true);
+      dispatch(deleteNoteRequest(noteId));
+    } else {
+      console.error("Note ID is not available");
+    }
+  };
 
   const handleShare = (email: string) => {
     if (noteToShare) {
@@ -114,13 +147,14 @@ export default function ViewNotes() {
       header: "Title",
       cell: ({ row }) => (
         <div
-          className="capitalize cursor-pointer"
-          onClick={() => setSelectedNote(row.original)}
+          className="capitalize cursor-pointer text-blue-500"
+          onClick={() => handleEdit(row.original)}
         >
           {row.getValue("title")}
         </div>
       ),
     },
+
     {
       accessorKey: "subject",
       header: ({ column }) => (
@@ -144,10 +178,14 @@ export default function ViewNotes() {
 
         const toggleWishlist = () => {
           const updatedWishlistStatus = !isWishlist;
+
           dispatch(
             updateNoteRequest({
-              ...row.original,
+              _id: row.original._id,
               wishlist: updatedWishlistStatus,
+              title: row.original.title,
+              subject: row.original.subject,
+              content: row.original.content,
             })
           );
         };
@@ -155,12 +193,19 @@ export default function ViewNotes() {
         return (
           <div className="text-right">
             <Button variant="ghost" onClick={toggleWishlist}>
-              {isWishlist ? <Star className="text-yellow-500" /> : <StarOff />}
+              {isWishlist ? (
+                <Star className="text-yellow-500" />
+              ) : (
+                <StarOff
+                  className={theme === "dark" ? "text-gray-400" : "text-black"}
+                />
+              )}
             </Button>
           </div>
         );
       },
     },
+
     {
       id: "actions",
       enableHiding: false,
@@ -171,22 +216,50 @@ export default function ViewNotes() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal />
+                <MoreHorizontal
+                  className={theme === "dark" ? "text-gray-400" : "text-black"}
+                />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleOpenSharePopover(note.id)}>
-                <Share />
-                Share Notes
-              </DropdownMenuItem>
-              <DropdownMenuItem>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" className="w-full text-left">
+                    <Share
+                      className={`mr-2 ${
+                        theme === "dark" ? "text-gray-400" : "text-black"
+                      }`}
+                    />
+                    Share Notes
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-4">
+                  <SharePopover
+                    noteId={note._id}
+                    onClose={() => setNoteToShare(null)}
+                    onShare={handleShare}
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <DropdownMenuItem onClick={() => setSelectedNote(note)}>
+                <Ellipsis
+                  className={theme === "dark" ? "text-gray-400" : "text-black"}
+                />
                 <span>View details</span>
               </DropdownMenuItem>
+
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-500">
-                <Trash2 />
+
+              <DropdownMenuItem
+                className="text-red-500"
+                onClick={() => handleDelete(note._id)}
+              >
+                <Trash2
+                  className={theme === "dark" ? "text-gray-400" : "text-black"}
+                />
                 Delete Notes
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -197,7 +270,7 @@ export default function ViewNotes() {
   ];
 
   const table = useReactTable({
-    data: notes,
+    data: notes || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -230,92 +303,105 @@ export default function ViewNotes() {
   }
 
   return (
-    <div className="w-full">
-      {showSharePopover && noteToShare && (
-        <SharePopover
-          noteId={noteToShare}
-          onClose={handleCloseSharePopover}
-          onShare={handleShare}
-        />
-      )}
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter Subjects..."
-          value={(table.getColumn("subject")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("subject")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-      </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
+    <>
+      {isLoading && <Spinner />}
+      {!isLoading && (
+        <div className="w-full">
+          {showSharePopover && noteToShare && (
+            <SharePopover
+              noteId={noteToShare}
+              onClose={handleCloseSharePopover}
+              onShare={handleShare}
+            />
+          )}
+          <div className="flex items-center py-4">
+            <Input
+              placeholder="Filter Subjects..."
+              value={
+                (table.getColumn("subject")?.getFilterValue() as string) ?? ""
+              }
+              onChange={(event) =>
+                table.getColumn("subject")?.setFilterValue(event.target.value)
+              }
+              className={`max-w-sm ${
+                theme === "dark" ? "bg-gray-700 text-white" : ""
+              }`}
+            />
+          </div>
+          <div
+            className={`rounded-md border ${
+              theme === "dark" ? "border-gray-600" : ""
+            }`}
+          >
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    ))}
+                  </TableRow>
                 ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No results.
                     </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }
