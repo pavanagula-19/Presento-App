@@ -1,14 +1,11 @@
 import { Request, Response } from "express";
 import Note, { INote } from "../models/note-schema";
-import pool from "../config/database-sql";
-import { RowDataPacket } from "mysql2";
+import User from "../models/user-schema";
 
 const validateUserId = async (userId: string): Promise<boolean> => {
   try {
-    const [rows] = await pool
-      .promise()
-      .query<RowDataPacket[]>("SELECT id FROM users WHERE id = ?", [userId]);
-    return rows.length > 0;
+    const user = await User.findById(userId); 
+    return user !== null;
   } catch (error) {
     console.error("Error validating userId:", error);
     throw error;
@@ -22,11 +19,11 @@ export const createNote = async (
   try {
     const { userId, title, subject, wishlist, content } = req.body;
 
-    const isValidUser = await validateUserId(userId);
+    const isValidUser = await validateUserId(userId); 
     if (!isValidUser) {
       res
         .status(400)
-        .json({ error: "Invalid userId. User not found in MySQL." });
+        .json({ error: "Invalid userId. User not found in MongoDB." });
       return;
     }
 
@@ -38,7 +35,7 @@ export const createNote = async (
       content,
     });
 
-    const savedNote = await newNote.save();
+    const savedNote = await newNote.save(); 
     res
       .status(201)
       .json({ message: "Note created successfully", note: savedNote });
@@ -54,15 +51,15 @@ export const getNotesByUser = async (
   try {
     const { userId } = req.params;
 
-    const isValidUser = await validateUserId(userId);
+    const isValidUser = await validateUserId(userId); 
     if (!isValidUser) {
       res
         .status(400)
-        .json({ error: "Invalid userId. User not found in MySQL." });
+        .json({ error: "Invalid userId. User not found in MongoDB." });
       return;
     }
 
-    const notes = await Note.find({ userId });
+    const notes = await Note.find({ userId }); 
     res.status(200).json({ notes });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });

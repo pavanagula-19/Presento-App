@@ -20,12 +20,10 @@ const AppRouter = () => {
 
 function App() {
   return (
-    <ThemeProvider>
       <BrowserRouter key="presento">
         <AppRouter />
         <Toaster position="top-right" toastOptions={{ duration: 2000 }} />
       </BrowserRouter>
-    </ThemeProvider>
   );
 }
 

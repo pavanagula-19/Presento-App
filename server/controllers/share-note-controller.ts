@@ -1,7 +1,6 @@
 import { Response } from "express";
 import SharedNote, { ISharedNote } from "../models/share-note-schema";
-import pool from "../config/database-sql";
-import { RowDataPacket } from "mysql2";
+import User from "../models/user-schema"; 
 import { AuthenticatedRequest } from "../config/types";
 
 export const createSharedNote = async (
@@ -18,13 +17,10 @@ export const createSharedNote = async (
 
     const sharedBy = req.user.id;
 
-    const [rows] = await pool
-      .promise()
-      .query<RowDataPacket[]>("SELECT email FROM users WHERE email = ?", [
-        sharedWith,
-      ]);
+    // Check if the recipient user exists in MongoDB
+    const recipientUser = await User.findOne({ email: sharedWith });
 
-    if (rows.length === 0) {
+    if (!recipientUser) {
       res.status(404).json({ error: "User not found. Cannot share note." });
       return;
     }
@@ -58,35 +54,33 @@ export const getSharedNotes = async (
 
     const email = req.user.email;
 
-    const sharedNotes = await SharedNote.find({ sharedBy: email });
+    // Find shared notes in MongoDB
+    const sharedNotes = await SharedNote.find({ sharedBy: req.user.id });
 
     if (sharedNotes.length === 0) {
       res.status(200).json({ sharedNotes: [] });
       return;
     }
 
+    // Fetch the users who shared the notes
     const sharedByIds = sharedNotes.map((note) => note.sharedBy.toString());
+    const users = await User.find({ _id: { $in: sharedByIds } }).select("_id email");
 
-    const [rows] = await pool
-      .promise()
-      .query<RowDataPacket[]>("SELECT id, email FROM users WHERE id IN (?)", [
-        sharedByIds,
-      ]);
-
+    // Create a mapping of user ID to email
     const userIdToEmailMap: Record<string, string> = {};
-    (rows as RowDataPacket[]).forEach((row) => {
-      userIdToEmailMap[row.id] = row.email;
+    users.forEach((user) => {
+      userIdToEmailMap[user._id.toString()] = user.email;
     });
 
-    const notesWithEmails = sharedNotes.map((note) => {
-      return {
-        ...note.toObject(),
-        sharedBy: userIdToEmailMap[note.sharedBy.toString()] || note.sharedBy,
-      };
-    });
+    // Replace `sharedBy` ID with corresponding email
+    const notesWithEmails = sharedNotes.map((note) => ({
+      ...note.toObject(),
+      sharedBy: userIdToEmailMap[note.sharedBy.toString()] || note.sharedBy,
+    }));
 
     res.status(200).json({ sharedNotes: notesWithEmails });
   } catch (error) {
+    console.error("Error fetching shared notes:", error);
     res.status(500).json({ error: (error as Error).message });
   }
 };

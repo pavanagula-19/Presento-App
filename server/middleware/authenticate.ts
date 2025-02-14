@@ -15,10 +15,11 @@ export const authenticate = (
   }
 
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET!
-    ) as AuthenticatedUser;
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is missing in environment variables");
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as AuthenticatedUser;
     req.user = decoded;
     next();
   } catch (error) {

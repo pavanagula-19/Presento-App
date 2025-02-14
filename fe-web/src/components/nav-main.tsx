@@ -20,7 +20,6 @@ import { useNavigate } from "react-router-dom";
 import { PATH } from "@/routes";
 import { useDispatch } from "react-redux";
 import { saveCurrentNoteId } from "@/redux/slices/note-slice";
-import { useTheme } from "./themed-context";
 
 export function NavMain({
   items,
@@ -37,15 +36,10 @@ export function NavMain({
 }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { theme } = useTheme();
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel
-        className={
-          theme === "dark" ? " bg-black text-gray-300" : "bg-white text-black"
-        }
-      >
+      <SidebarGroupLabel className="bg-white text-black">
         Platform
       </SidebarGroupLabel>
       <SidebarMenu>
@@ -60,19 +54,11 @@ export function NavMain({
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton
                   tooltip={item.title}
-                  className={`flex items-center justify-between w-full p-2 rounded-md transition-colors duration-200 ${
-                    theme === "dark"
-                      ? "bg-gray-800 hover:bg-gray-800 text-white hover:text-white"
-                      : "bg-white text-black hover:bg-gray-100"
-                  }`}
+                  className="flex items-center justify-between w-full p-2 rounded-md transition-colors duration-200 bg-white text-black hover:bg-gray-100"
                 >
                   {item.icon && <item.icon className="mr-2" />}
                   <span>{item.title}</span>
-                  <ChevronRight
-                    className={`ml-auto transition-transform duration-200 ${
-                      theme === "dark" ? "text-gray-400" : "text-gray-600"
-                    } group-data-[state=open]/collapsible:rotate-90`}
-                  />
+                  <ChevronRight className="ml-auto transition-transform duration-200 text-gray-600 group-data-[state=open]/collapsible:rotate-90" />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
               <CollapsibleContent>
@@ -86,11 +72,7 @@ export function NavMain({
                             dispatch(saveCurrentNoteId(undefined));
                           navigate(subItem?.url);
                         }}
-                        className={`flex items-center w-full p-2 rounded-md transition-colors duration-200 ${
-                          theme === "dark"
-                            ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                            : "bg-gray-200 text-black hover:bg-gray-300"
-                        }`}
+                        className="flex items-center w-full p-2 rounded-md transition-colors duration-200 bg-gray-200 text-black hover:bg-gray-300"
                       >
                         <span>{subItem.title}</span>
                       </SidebarMenuSubButton>

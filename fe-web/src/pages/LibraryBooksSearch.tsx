@@ -12,7 +12,6 @@ import {
   selectBooksLoading,
 } from "@/redux/selectors/library-book-selector";
 import { PATH } from "@/routes";
-import { useTheme } from "../components/themed-context";
 
 export default function LibraryBooksSearch() {
   const dispatch = useDispatch();
@@ -20,7 +19,6 @@ export default function LibraryBooksSearch() {
   const books = useSelector(selectBooks);
   const loading = useSelector(selectBooksLoading);
   const error = useSelector(selectBooksError);
-  const { theme } = useTheme();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [wishlist, setWishlist] = useState<string[]>([]);
@@ -61,11 +59,7 @@ export default function LibraryBooksSearch() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div
-      className={`container mx-auto p-4 ${
-        theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"
-      }`}
-    >
+    <div className="container mx-auto p-4 bg-white text-black">
       <h1 className="text-2xl font-bold mb-4 text-center">LIBRARY BOOKS</h1>
       <div className="flex justify-center items-center mb-6 space-x-2">
         <input
@@ -73,26 +67,14 @@ export default function LibraryBooksSearch() {
           placeholder="Search by title or author"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className={`border rounded p-2 ${
-            theme === "dark"
-              ? "bg-gray-800 text-white border-gray-700"
-              : "bg-white text-black border-gray-300"
-          }`}
+          className="border rounded p-2 bg-white text-black border-gray-300"
         />
         <Popover>
-          <Filter
-            className={`w-6 h-6 cursor-pointer ${
-              theme === "dark" ? "text-white" : "text-gray-600"
-            }`}
-          />
+          <Filter className="w-6 h-6 cursor-pointer text-gray-600" />
         </Popover>
       </div>
       <div className="overflow-x-auto">
-        <table
-          className={`min-w-full shadow-md rounded-lg ${
-            theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-black"
-          }`}
-        >
+        <table className="min-w-full shadow-md rounded-lg bg-white text-black">
           <thead>
             <tr>
               <th className="py-2 px-4 border-b text-center">Image</th>
@@ -103,12 +85,7 @@ export default function LibraryBooksSearch() {
           </thead>
           <tbody>
             {currentBooks.map((book, index) => (
-              <tr
-                key={index}
-                className={`hover:bg-gray-100 ${
-                  theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"
-                }`}
-              >
+              <tr key={index} className="hover:bg-gray-100">
                 <td className="py-2 px-4 border-b text-center">
                   <img
                     src={book.imageUrl}
@@ -128,13 +105,7 @@ export default function LibraryBooksSearch() {
                       className="bg-transparent"
                     >
                       <Star
-                        className={`w-6 h-6 ${
-                          wishlist.includes(book.title)
-                            ? "text-yellow-500"
-                            : theme === "dark"
-                            ? "text-gray-400"
-                            : "text-gray-400"
-                        }`}
+                        className={`w-6 h-6 ${wishlist.includes(book.title) ? "text-yellow-500" : "text-gray-400"}`}
                       />
                     </button>
                   </div>

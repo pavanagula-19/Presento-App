@@ -13,7 +13,7 @@ import {
   flexRender,
 } from "@tanstack/react-table";
 import {
-  ArrowUpDown,
+ 
   Ellipsis,
   MoreHorizontal,
   Share,
@@ -61,7 +61,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@radix-ui/react-popover";
-import { useTheme } from "../components/themed-context";
 
 export type Notes = {
   _id: string;
@@ -78,7 +77,6 @@ export default function ViewNotes() {
   const error = useSelector(selectNoteError);
   const user = useSelector(selectUserInfo);
 
-  const { theme } = useTheme();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -159,11 +157,9 @@ export default function ViewNotes() {
       accessorKey: "subject",
       header: ({ column }) => (
         <Button
-          variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Subject
-          <ArrowUpDown />
         </Button>
       ),
       cell: ({ row }) => (
@@ -192,12 +188,12 @@ export default function ViewNotes() {
 
         return (
           <div className="text-right">
-            <Button variant="ghost" onClick={toggleWishlist}>
+            <Button  onClick={toggleWishlist}>
               {isWishlist ? (
                 <Star className="text-yellow-500" />
               ) : (
                 <StarOff
-                  className={theme === "dark" ? "text-gray-400" : "text-black"}
+                  className="text-white"
                 />
               )}
             </Button>
@@ -215,9 +211,9 @@ export default function ViewNotes() {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button className="h-8 w-8 p-0">
                 <MoreHorizontal
-                  className={theme === "dark" ? "text-gray-400" : "text-black"}
+                  className="text-white"
                 />
               </Button>
             </DropdownMenuTrigger>
@@ -226,11 +222,9 @@ export default function ViewNotes() {
 
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" className="w-full text-left">
+                  <Button className="w-full text-left">
                     <Share
-                      className={`mr-2 ${
-                        theme === "dark" ? "text-gray-400" : "text-black"
-                      }`}
+                      className="mr-2"
                     />
                     Share Notes
                   </Button>
@@ -246,7 +240,6 @@ export default function ViewNotes() {
 
               <DropdownMenuItem onClick={() => setSelectedNote(note)}>
                 <Ellipsis
-                  className={theme === "dark" ? "text-gray-400" : "text-black"}
                 />
                 <span>View details</span>
               </DropdownMenuItem>
@@ -258,7 +251,6 @@ export default function ViewNotes() {
                 onClick={() => handleDelete(note._id)}
               >
                 <Trash2
-                  className={theme === "dark" ? "text-gray-400" : "text-black"}
                 />
                 Delete Notes
               </DropdownMenuItem>
@@ -323,15 +315,11 @@ export default function ViewNotes() {
               onChange={(event) =>
                 table.getColumn("subject")?.setFilterValue(event.target.value)
               }
-              className={`max-w-sm ${
-                theme === "dark" ? "bg-gray-700 text-white" : ""
-              }`}
+              className="max-w-sm"
             />
           </div>
           <div
-            className={`rounded-md border ${
-              theme === "dark" ? "border-gray-600" : ""
-            }`}
+            className="rounded-md border border-gray-900"
           >
             <Table>
               <TableHeader>

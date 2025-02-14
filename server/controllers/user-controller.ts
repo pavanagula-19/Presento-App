@@ -1,33 +1,39 @@
 import { Request, Response } from "express";
-import sql_database from "../config/database-sql";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import User from "../models/user-schema";
 
-interface User {
-  id: number;
+
+interface UserDocument extends Document {
   first_name: string;
   last_name: string;
   email: string;
   password: string;
+  role: string;
 }
+
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const { first_name, last_name, email, password, role } = req.body;
 
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      res.status(400).json({ message: "User already exists" });
+      return;
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const query = `
-      INSERT INTO users (first_name, last_name, email, password, role) 
-      VALUES (?, ?, ?, ?, ?)
-    `;
-    await sql_database.execute(query, [
+    const newUser = new User({
       first_name,
       last_name,
       email,
-      hashedPassword,
-      role || "user", // Default to 'user' if no role is provided
-    ]);
+      password: hashedPassword,
+      role,
+    });
+
+    await newUser.save();
 
     res.status(201).json({ message: "User Created Successfully" });
   } catch (error) {
@@ -39,18 +45,12 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
 
-    const [rows]: any = await sql_database
-      .promise()
-      .execute("SELECT * FROM users WHERE email = ?", [email]);
+    const user = await User.findOne({ email });
 
-    console.log("Query result:", rows);
-
-    if (!rows || rows.length === 0) {
+    if (!user) {
       res.status(404).json({ message: "User Not Found" });
       return;
     }
-
-    const user: User = rows[0];
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
@@ -58,9 +58,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is missing in environment variables");
+    }
+
     const token = jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET as string,
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
@@ -68,26 +72,22 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       message: "Login Successful",
       token,
       user: {
-        id: user.id,
+        id: user._id,
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
       },
     });
   } catch (error) {
-    console.error("Error during login:", error);
     res.status(500).json({ error: (error as Error).message });
   }
 };
 
-export const getAllUsers = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
   try {
-    const query =
-      "SELECT id, first_name, last_name, email, created_at FROM users";
-    const [users]: any = await sql_database.execute(query);
+    const users = await User.find({}, "first_name last_name email createdAt").sort({
+      createdAt: -1,
+    });
 
     res.status(200).json({ users });
   } catch (error) {
@@ -95,76 +95,62 @@ export const getAllUsers = async (
   }
 };
 
-export const getUserById = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const getUserById = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const user = await User.findById(id, "first_name last_name email createdAt");
 
-    const query =
-      "SELECT id, first_name, last_name, email, created_at FROM users WHERE id = ?";
-    const [user]: any = await sql_database.execute(query, [id]);
-
-    if (user.length === 0) {
+    if (!user) {
       res.status(404).json({ message: "User Not Found" });
       return;
     }
 
-    res.status(200).json({ user: user[0] });
+    res.status(200).json({ user });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
 };
 
-export const updateUser = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const updateUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { first_name, last_name, email, password, role } = req.body;
 
-    const hashedPassword = password
-      ? await bcrypt.hash(password, 10)
-      : undefined;
-
-    const query = `
-      UPDATE users 
-      SET first_name = ?, last_name = ?, email = ?, password = ?, role = ?
-      WHERE id = ?
-    `;
-    const [result]: any = await sql_database.execute(query, [
+    // Define an update object that only includes fields that exist in the schema
+    const updatedUserData: Partial<UserDocument> = {
       first_name,
       last_name,
       email,
-      hashedPassword || null,
-      role || "user",
-      id,
-    ]);
+      role,
+    };
 
-    if (result.affectedRows === 0) {
+    // Only update password if provided
+    if (password) {
+      updatedUserData.password = await bcrypt.hash(password, 10);
+    }
+
+    // Find and update the user
+    const user = await User.findByIdAndUpdate(id, updatedUserData, { new: true });
+
+    if (!user) {
       res.status(404).json({ message: "User Not Found" });
       return;
     }
 
-    res.status(200).json({ message: "User Updated Successfully" });
+    res.status(200).json({ message: "User Updated Successfully", user });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
 };
 
-export const deleteUser = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+
+export const deleteUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
-    const query = "DELETE FROM users WHERE id = ?";
-    const [result]: any = await sql_database.execute(query, [id]);
+    const user = await User.findByIdAndDelete(id);
 
-    if (result.affectedRows === 0) {
+    if (!user) {
       res.status(404).json({ message: "User Not Found" });
       return;
     }

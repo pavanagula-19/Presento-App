@@ -28,7 +28,6 @@ import {
 import { selectUserInfo } from "../redux/selectors/user-selector";
 import { logout } from "../redux/slices/user-slice";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "./themed-context";
 
 export function NavUser() {
   const dispatch = useDispatch();
@@ -40,8 +39,6 @@ export function NavUser() {
     navigate("/login");
   };
 
-  const { theme } = useTheme();
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -49,11 +46,7 @@ export function NavUser() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className={`flex items-center gap-2 p-2 rounded-md transition-colors duration-200 ${
-                theme === "dark"
-                  ? "bg-black text-gray-300 hover:bg-gray-700"
-                  : "bg-white text-black hover:bg-gray-100"
-              }`}
+              className="flex items-center gap-2 p-2 rounded-md transition-colors duration-200 bg-white text-black hover:bg-gray-100"
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
@@ -70,19 +63,11 @@ export function NavUser() {
                   {user?.email || "guest@example.com"}
                 </span>
               </div>
-              <ChevronsUpDown
-                className={`ml-auto size-4 ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-600"
-                }`}
-              />
+              <ChevronsUpDown className="ml-auto size-4 text-gray-600" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className={`w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg ${
-              theme === "dark"
-                ? "bg-gray-900 text-gray-300"
-                : "bg-white text-black"
-            }`}
+            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg bg-white text-black"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
@@ -109,32 +94,22 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem className="flex items-center gap-2">
-                <Sparkles
-                  className={
-                    theme === "dark" ? "text-yellow-400" : "text-black"
-                  }
-                />
+                <Sparkles className="text-black" />
                 Upgrade to Pro
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem className="flex items-center gap-2">
-                <BadgeCheck
-                  className={theme === "dark" ? "text-green-400" : "text-black"}
-                />
+                <BadgeCheck className="text-black" />
                 Account
               </DropdownMenuItem>
               <DropdownMenuItem className="flex items-center gap-2">
-                <CreditCard
-                  className={theme === "dark" ? "text-blue-400" : "text-black"}
-                />
+                <CreditCard className="text-black" />
                 Billing
               </DropdownMenuItem>
               <DropdownMenuItem className="flex items-center gap-2">
-                <Bell
-                  className={theme === "dark" ? "text-red-400" : "text-black"}
-                />
+                <Bell className="text-black" />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -143,9 +118,7 @@ export function NavUser() {
               onClick={handleLogout}
               className="flex items-center gap-2"
             >
-              <LogOut
-                className={theme === "dark" ? "text-red-400" : "text-black"}
-              />
+              <LogOut className="text-black" />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

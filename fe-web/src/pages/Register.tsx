@@ -9,7 +9,6 @@ import { registerRequest } from "../redux/slices/user-slice";
 import { RootState } from "../redux/store";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { useTheme } from "../components/themed-context";
 
 export function RegisterForm({
   className,
@@ -19,7 +18,6 @@ export function RegisterForm({
   const loading = useSelector((state: RootState) => state.user.loading);
   const error = useSelector((state: RootState) => state.user.error);
   const navigate = useNavigate();
-  const { theme } = useTheme();
 
   const [first_name, setFirstName] = useState("");
   const [last_name, setLastName] = useState("");
@@ -46,9 +44,7 @@ export function RegisterForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card
-        className={`overflow-hidden ${
-          theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-black"
-        }`}
+        className="overflow-hidden bg-white text-black"
       >
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
@@ -56,9 +52,7 @@ export function RegisterForm({
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Create an Account</h1>
                 <p
-                  className={`text-balance ${
-                    theme === "dark" ? "text-gray-300" : "text-muted-foreground"
-                  }`}
+                  className="text-balance text-muted-foreground"
                 >
                   Sign up for your Presento account
                 </p>
@@ -72,9 +66,7 @@ export function RegisterForm({
                   value={first_name}
                   onChange={(e) => setFirstName(e.target.value)}
                   required
-                  className={`${
-                    theme === "dark" ? "bg-gray-700 text-white" : ""
-                  }`}
+                  className="bg-gray-700 text-white"
                 />
               </div>
               <div className="grid gap-2">
@@ -86,9 +78,7 @@ export function RegisterForm({
                   value={last_name}
                   onChange={(e) => setLastName(e.target.value)}
                   required
-                  className={`${
-                    theme === "dark" ? "bg-gray-700 text-white" : ""
-                  }`}
+                  className="bg-gray-700 text-white"
                 />
               </div>
               <div className="grid gap-2">
@@ -100,9 +90,7 @@ export function RegisterForm({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className={`${
-                    theme === "dark" ? "bg-gray-700 text-white" : ""
-                  }`}
+                  className="bg-gray-700 text-white"
                 />
               </div>
               <div className="grid gap-2">
@@ -114,25 +102,19 @@ export function RegisterForm({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className={`${
-                    theme === "dark" ? "bg-gray-700 text-white" : ""
-                  }`}
+                  className="bg-gray-700 text-white"
                 />
               </div>
               <Button
                 type="submit"
-                className={`w-full ${
-                  theme === "dark" ? "bg-gray-600 text-white" : "bg-customBlue"
-                }`}
+                className="w-full bg-customBlue"
                 disabled={loading}
               >
                 {loading ? "Registering..." : "Register"}
               </Button>
               {error && <p className="text-red-500">{error}</p>}
               <div
-                className={`text-center text-sm ${
-                  theme === "dark" ? "text-gray-300" : ""
-                }`}
+                className="text-center text-sm"
               >
                 Already have an account?{" "}
                 <a
@@ -149,9 +131,7 @@ export function RegisterForm({
             <img
               src="https://ik.imagekit.io/pavanagulla19/elephant.jpg?updatedAt=1737743253686"
               alt="Image"
-              className={`absolute inset-0 h-full w-full object-cover ${
-                theme === "dark" ? "brightness-[0.2] grayscale" : ""
-              }`}
+              className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
         </CardContent>
