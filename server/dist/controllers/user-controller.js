@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -16,15 +7,15 @@ exports.deleteUser = exports.updateUser = exports.getUserById = exports.getAllUs
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const user_schema_1 = __importDefault(require("../models/user-schema"));
-const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const register = async (req, res) => {
     try {
         const { first_name, last_name, email, password, role } = req.body;
-        const existingUser = yield user_schema_1.default.findOne({ email });
+        const existingUser = await user_schema_1.default.findOne({ email });
         if (existingUser) {
             res.status(400).json({ message: "User already exists" });
             return;
         }
-        const hashedPassword = yield bcrypt_1.default.hash(password, 10);
+        const hashedPassword = await bcrypt_1.default.hash(password, 10);
         const newUser = new user_schema_1.default({
             first_name,
             last_name,
@@ -32,23 +23,23 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             password: hashedPassword,
             role,
         });
-        yield newUser.save();
+        await newUser.save();
         res.status(201).json({ message: "User Created Successfully" });
     }
     catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+};
 exports.register = register;
-const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = yield user_schema_1.default.findOne({ email });
+        const user = await user_schema_1.default.findOne({ email });
         if (!user) {
             res.status(404).json({ message: "User Not Found" });
             return;
         }
-        const isPasswordValid = yield bcrypt_1.default.compare(password, user.password);
+        const isPasswordValid = await bcrypt_1.default.compare(password, user.password);
         if (!isPasswordValid) {
             res.status(401).json({ message: "Invalid Credentials" });
             return;
@@ -71,11 +62,11 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+};
 exports.login = login;
-const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllUsers = async (req, res) => {
     try {
-        const users = yield user_schema_1.default.find({}, "first_name last_name email createdAt").sort({
+        const users = await user_schema_1.default.find({}, "first_name last_name email createdAt").sort({
             createdAt: -1,
         });
         res.status(200).json({ users });
@@ -83,12 +74,12 @@ const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+};
 exports.getAllUsers = getAllUsers;
-const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getUserById = async (req, res) => {
     try {
         const { id } = req.params;
-        const user = yield user_schema_1.default.findById(id, "first_name last_name email createdAt");
+        const user = await user_schema_1.default.findById(id, "first_name last_name email createdAt");
         if (!user) {
             res.status(404).json({ message: "User Not Found" });
             return;
@@ -98,9 +89,9 @@ const getUserById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+};
 exports.getUserById = getUserById;
-const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
         const { first_name, last_name, email, password, role } = req.body;
@@ -113,10 +104,10 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         };
         // Only update password if provided
         if (password) {
-            updatedUserData.password = yield bcrypt_1.default.hash(password, 10);
+            updatedUserData.password = await bcrypt_1.default.hash(password, 10);
         }
         // Find and update the user
-        const user = yield user_schema_1.default.findByIdAndUpdate(id, updatedUserData, { new: true });
+        const user = await user_schema_1.default.findByIdAndUpdate(id, updatedUserData, { new: true });
         if (!user) {
             res.status(404).json({ message: "User Not Found" });
             return;
@@ -126,12 +117,12 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+};
 exports.updateUser = updateUser;
-const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const user = yield user_schema_1.default.findByIdAndDelete(id);
+        const user = await user_schema_1.default.findByIdAndDelete(id);
         if (!user) {
             res.status(404).json({ message: "User Not Found" });
             return;
@@ -141,5 +132,5 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+};
 exports.deleteUser = deleteUser;

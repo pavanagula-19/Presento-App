@@ -2,10 +2,12 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
- "scripts": {
-  "start": "node dist/server.js",
-  "build": "tsc"
-},
+  "scripts": {
+    "dev": "nodemon",
+    "start": "ts-node -r tsconfig-paths/register src/server.ts",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "author": "",
   "license": "ISC",
   "description": "",
@@ -19,6 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.10.1",
     "mysql2": "^3.12.0",
+    "tsconfig-paths": "^4.2.0",
     "twilio": "^5.4.4"
   },
   "devDependencies": {
