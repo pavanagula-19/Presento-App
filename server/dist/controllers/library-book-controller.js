@@ -17,6 +17,7 @@ const library_book_schema_1 = __importDefault(require("../models/library-book-sc
 const updateWishlist = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId, wishlist } = req.body;
+        console.log(req.params);
         const { bookId } = req.params;
         if (!userId) {
             res.status(400).json({ message: "User ID is required" });

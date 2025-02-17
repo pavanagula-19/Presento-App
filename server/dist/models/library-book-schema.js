@@ -42,7 +42,7 @@ const BookSchema = new mongoose_1.Schema({
     wishlist: [
         {
             user: { type: mongoose_1.default.Schema.Types.ObjectId, ref: "User", required: true },
-            added: { type: Boolean, default: false }, // Indicates whether the book is wishlisted by the user
+            added: { type: Boolean, default: false },
         },
     ],
 }, { timestamps: true });
