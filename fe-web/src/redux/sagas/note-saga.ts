@@ -18,12 +18,15 @@ import {
   updateWishlistSuccess,
   updateWishlistFailure,
 } from "../slices/note-slice";
+import { config } from "@/config";
+
+const BASE_URL = `${config.server.baseUrl}/api/notes`;
 
 function* fetchNotesSaga({ payload }: PayloadAction<string>) {
   try {
     const response: AxiosResponse<any> = yield call(
       axios.get,
-      `http://localhost:8000/api/notes/${payload}`
+      `${BASE_URL}/${payload}`
     );
     yield put(fetchNotesSuccess(response.data.notes));
   } catch (error: any) {
@@ -35,7 +38,7 @@ function* createNoteSaga({ payload }: PayloadAction<any>) {
   try {
     const response: AxiosResponse<any> = yield call(
       axios.post,
-      "http://localhost:8000/api/notes",
+      `${BASE_URL}`,
       payload
     );
     yield put(createNoteSuccess(response.data.note));
@@ -48,7 +51,7 @@ function* updateNoteSaga({ payload }: PayloadAction<{ noteId: string; content: s
   try {
     const response: AxiosResponse<any> = yield call(
       axios.put,
-      `http://localhost:8000/api/notes/${payload.noteId}`,
+      `${BASE_URL}/${payload.noteId}`,
       payload
     );
     yield put(updateNoteSuccess(response.data.note));
@@ -61,7 +64,7 @@ function* updateWishlistSaga({ payload }: PayloadAction<any>) {
   try {
     const response: AxiosResponse<any> = yield call(
       axios.put,
-      `http://localhost:8000/api/notes/${payload._id}`,
+      `${BASE_URL}/${payload._id}`,
       payload
     );
     yield put(updateWishlistSuccess(response.data.note));
@@ -72,7 +75,7 @@ function* updateWishlistSaga({ payload }: PayloadAction<any>) {
 
 function* deleteNoteSaga({ payload }: PayloadAction<string>) {
   try {
-    yield call(axios.delete, `http://localhost:8000/api/notes/${payload}`);
+    yield call(axios.delete, `${BASE_URL}/${payload}`);
     yield put(deleteNoteSuccess(payload));
   } catch (error: any) {
     yield put(deleteNoteFailure(error.message));

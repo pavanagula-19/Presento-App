@@ -17,8 +17,9 @@ import {
   toggleWishlistSuccess,
   toggleWishlistFailure,
 } from "../slices/library-book-slice";
+import { config } from "@/config";
 
-const BASE_URL = "http://localhost:8000/api/library/books/";
+const BASE_URL = `${config.server.baseUrl}/api/library/books`;
 
 function* fetchBooksSaga() {
   try {
@@ -40,7 +41,7 @@ function* addBookSaga(action: ReturnType<typeof addBookRequest>) {
 
 function* updateBookSaga(action: ReturnType<typeof updateBookRequest>) {
   try {
-    const response: AxiosResponse<any> = yield call(axios.put, `${BASE_URL}${action.payload._id}`, action.payload);
+    const response: AxiosResponse<any> = yield call(axios.put, `${BASE_URL}/${action.payload._id}`, action.payload);
     yield put(updateBookSuccess(response.data));
   } catch (error: any) {
     yield put(updateBookFailure(error?.response?.data?.message || error.message));
@@ -49,7 +50,7 @@ function* updateBookSaga(action: ReturnType<typeof updateBookRequest>) {
 
 function* deleteBookSaga(action: ReturnType<typeof deleteBookRequest>) {
   try {
-    yield call(axios.delete, `${BASE_URL}${action.payload}`);
+    yield call(axios.delete, `${BASE_URL}/${action.payload}`);
     yield put(deleteBookSuccess(action.payload));
   } catch (error: any) {
     yield put(deleteBookFailure(error?.response?.data?.message || error.message));
@@ -60,7 +61,7 @@ function* toggleWishlistSaga(action: ReturnType<typeof toggleWishlistRequest>) {
   try {
     const response: AxiosResponse<any> = yield call(
       axios.patch,
-      `${BASE_URL}${action.payload.id}/wishlist`,
+      `${BASE_URL}/${action.payload.id}/wishlist`,
       { wishlist: action.payload.wishlist,userId:action.payload.userId }
     );
     yield put(toggleWishlistSuccess(response.data));

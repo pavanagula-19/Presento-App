@@ -18,15 +18,14 @@ import {
 } from "../slices/user-slice";
 import axios, { AxiosResponse } from "axios";
 import { PayloadAction } from "@reduxjs/toolkit";
+import { config } from "@/config";
 
-const API_URL = "http://localhost:8000/api/user";
+const API_URL = `${config.server.baseUrl}/api/user`;
 
-// Create an Axios instance
 const apiClient = axios.create({
   baseURL: API_URL,
 });
 
-// Add a request interceptor to include the token
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("authToken");

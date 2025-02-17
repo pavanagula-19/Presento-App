@@ -1,26 +1,28 @@
+import { config } from "@/config";
+import { PayloadAction } from "@reduxjs/toolkit";
+import axios, { AxiosResponse } from "axios";
 import { call, put, takeLatest } from "redux-saga/effects";
-import { AxiosResponse } from "axios";
-import apiClient from "../apiClient";
 import {
-  fetchSharedNotesRequest,
-  fetchSharedNotesSuccess,
-  fetchSharedNotesFailure,
-  fetchReceivedNotesRequest,
-  fetchReceivedNotesSuccess,
-  fetchReceivedNotesFailure,
+  createSharedNoteFailure,
   createSharedNoteRequest,
   createSharedNoteSuccess,
-  createSharedNoteFailure,
+  deleteSharedNoteFailure,
   deleteSharedNoteRequest,
   deleteSharedNoteSuccess,
-  deleteSharedNoteFailure,
+  fetchReceivedNotesFailure,
+  fetchReceivedNotesRequest,
+  fetchReceivedNotesSuccess,
+  fetchSharedNotesFailure,
+  fetchSharedNotesRequest,
+  fetchSharedNotesSuccess,
   SharedNote,
 } from "../slices/share-note-slice";
-import { PayloadAction } from "@reduxjs/toolkit";
+
+const BASE_URL = `${config.server.baseUrl}/api`;
 
 function* fetchSharedNotesSaga() {
   try {
-    const response: AxiosResponse<{ sharedNotes: SharedNote[] }> = yield call(apiClient.get, "shared/notes/sent");
+    const response: AxiosResponse<{ sharedNotes: SharedNote[] }> = yield call(axios.get, `${BASE_URL}/shared/notes/sent`);
 
     yield put(fetchSharedNotesSuccess(response.data.sharedNotes));
   } catch (error: any) {
@@ -30,7 +32,7 @@ function* fetchSharedNotesSaga() {
 
 function* fetchReceivedNotesSaga() {
   try {
-    const response: AxiosResponse<{ receivedNotes: SharedNote[] }> = yield call(apiClient.get, "/shared/notes/received");
+    const response: AxiosResponse<{ receivedNotes: SharedNote[] }> = yield call(axios.get, `${BASE_URL}/shared/notes/received`);
     yield put(fetchReceivedNotesSuccess(response.data.receivedNotes));
   } catch (error: any) {
     yield put(fetchReceivedNotesFailure(error?.message));
@@ -39,7 +41,7 @@ function* fetchReceivedNotesSaga() {
 
 function* createSharedNoteSaga(action: PayloadAction<{ noteId: string; sharedWith: string }>) {
   try {
-    const response: AxiosResponse<{ sharedNote: SharedNote }> = yield call(apiClient.post, "/shared/notes/", action.payload);
+    const response: AxiosResponse<{ sharedNote: SharedNote }> = yield call(axios.post, `${BASE_URL}/shared/notes`, action.payload);
     yield put(createSharedNoteSuccess(response.data.sharedNote));
   } catch (error: any) {
     yield put(createSharedNoteFailure(error?.message));
@@ -48,7 +50,7 @@ function* createSharedNoteSaga(action: PayloadAction<{ noteId: string; sharedWit
 
 function* deleteSharedNoteSaga(action: PayloadAction<string>) {
   try {
-    yield call(apiClient.delete, `/shared/notes/${action.payload}`);
+    yield call(axios.delete, `${BASE_URL}/shared/notes/${action.payload}`);
     yield put(deleteSharedNoteSuccess(action.payload));
   } catch (error: any) {
     yield put(deleteSharedNoteFailure(error?.message));
