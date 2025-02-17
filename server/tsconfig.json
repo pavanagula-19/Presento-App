@@ -1,9 +1,15 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
+    "target": "ESNext",
+    "module": "CommonJS",
+    "strict": true,
     "esModuleInterop": true,
-    "types": ["node"],
-    "strict": true
-  }
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "types": ["node"]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }
