@@ -3,13 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface SharePopoverProps {
-  noteId: string;
   onClose: () => void;
   onShare: (email: string) => void;
 }
 
 const SharePopover: React.FC<SharePopoverProps> = ({
-  noteId,
   onClose,
   onShare,
 }) => {

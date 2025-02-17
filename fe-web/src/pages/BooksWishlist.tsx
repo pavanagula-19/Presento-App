@@ -35,7 +35,7 @@ const BooksWishList: React.FC = () => {
           ) : (
             <ul className="space-y-2">
               {wishlistBooks.map((book) => (
-                <li key={book.id} className="p-3 bg-white rounded-lg shadow-sm">
+                <li key={book._id} className="p-3 bg-white rounded-lg shadow-sm">
                   <p className="font-semibold text-gray-800">{book.title}</p>
                   <p className="text-gray-500">{book.author}</p>
                   <a

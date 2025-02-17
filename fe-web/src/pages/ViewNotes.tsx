@@ -1,19 +1,16 @@
-import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   ColumnDef,
-  SortingState,
-  useReactTable,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
   ColumnFiltersState,
+  SortingState,
   VisibilityState,
   flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
 } from "@tanstack/react-table";
 import {
- 
   Ellipsis,
   MoreHorizontal,
   Share,
@@ -21,6 +18,8 @@ import {
   StarOff,
   Trash2,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -41,26 +40,26 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { Spinner } from "@/components/spinner";
 import {
-  selectNotes,
-  selectNoteLoading,
   selectNoteError,
+  selectNoteLoading,
+  selectNotes,
 } from "@/redux/selectors/note-selector";
+import { selectUserInfo } from "@/redux/selectors/user-selector";
 import {
   deleteNoteRequest,
   fetchNotesRequest,
   updateWishlistRequest,
 } from "@/redux/slices/note-slice";
-import { selectUserInfo } from "@/redux/selectors/user-selector";
 import { createSharedNoteRequest } from "@/redux/slices/share-note-slice";
-import NoteDetail from "./NotesDetails";
-import SharePopover from "./sharePop";
-import { Spinner } from "@/components/spinner";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@radix-ui/react-popover";
+import NoteDetail from "./NotesDetails";
+import SharePopover from "./sharePop";
 
 export type Notes = {
   _id: string;
@@ -82,7 +81,6 @@ export default function ViewNotes() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [selectedNote, setSelectedNote] = useState<Notes | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
 
 
   const [showSharePopover, setShowSharePopover] = useState(false);
@@ -92,7 +90,6 @@ export default function ViewNotes() {
 
   const handleEdit = (note: Notes) => {
     setSelectedNote(note);
-    setIsEditing(true);
   };
   useEffect(() => {
     if (notes) {
@@ -122,11 +119,6 @@ export default function ViewNotes() {
       );
       setShowSharePopover(false);
     }
-  };
-
-  const handleOpenSharePopover = (noteId: string) => {
-    setNoteToShare(noteId);
-    setShowSharePopover(true);
   };
 
   const handleCloseSharePopover = () => {
@@ -228,7 +220,6 @@ export default function ViewNotes() {
   </PopoverTrigger>
   <PopoverContent className="w-64 p-4 bg-white border border-gray-300 shadow-lg rounded-md z-50">
     <SharePopover
-      noteId={note._id}
       onClose={() => setNoteToShare(null)}
       onShare={handleShare}
     />
@@ -299,7 +290,6 @@ export default function ViewNotes() {
         <div className="w-full">
           {showSharePopover && noteToShare && (
             <SharePopover
-              noteId={noteToShare}
               onClose={handleCloseSharePopover}
               onShare={handleShare}
             />

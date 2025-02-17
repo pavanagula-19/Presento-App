@@ -39,7 +39,7 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    registerRequest(state, action: PayloadAction<RegisterPayload>) {
+    registerRequest(state, _action: PayloadAction<RegisterPayload>) {
       state.loading = true;
       state.error = null;
     },
@@ -51,7 +51,7 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    loginRequest(state, action: PayloadAction<LoginPayload>) {
+    loginRequest(state, _action: PayloadAction<LoginPayload>) {
       state.loading = true;
       state.error = null;
     },

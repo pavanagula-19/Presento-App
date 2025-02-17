@@ -1,14 +1,3 @@
-import  { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { MoreHorizontal, Share, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -27,22 +16,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { MoreHorizontal, Share, Trash2 } from "lucide-react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-import { fetchReceivedNotesRequest } from "@/redux/slices/share-note-slice";
-import { fetchNotesRequest } from "@/redux/slices/note-slice"; 
 import {
   selectReceivedNotes,
-  selectShareNoteLoading,
   selectShareNoteError,
+  selectShareNoteLoading,
 } from "@/redux/selectors/share-note-selector";
 import { selectUserInfo } from "@/redux/selectors/user-selector";
-import { selectNotes } from "@/redux/selectors/note-selector"; 
+import { fetchNotesRequest } from "@/redux/slices/note-slice";
+import { fetchReceivedNotesRequest } from "@/redux/slices/share-note-slice";
 
 export default function SharedNotes() {
   const dispatch = useDispatch();
   const sharedNotes = useSelector(selectReceivedNotes);
-  console.log(sharedNotes,'llllllllllllllllll')
-  const notes = useSelector(selectNotes);
   const loading = useSelector(selectShareNoteLoading);
   const error = useSelector(selectShareNoteError);
   const user = useSelector(selectUserInfo);
