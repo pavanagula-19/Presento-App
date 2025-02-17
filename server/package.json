@@ -2,11 +2,10 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "start": "nodemon server.ts"
-  },
+ "scripts": {
+  "start": "node dist/server.js",
+  "build": "tsc"
+},
   "author": "",
   "license": "ISC",
   "description": "",
