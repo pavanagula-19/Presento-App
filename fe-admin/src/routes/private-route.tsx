@@ -1,10 +1,10 @@
+import Settings from "@/components/settings";
+import { PrivateLayout } from "@/layouts/private-layout";
+import Customers from "@/pages/customer";
+import DashboardPage from "@/pages/dashboard";
+import Products from "@/pages/products";
 import { RouteObject } from "react-router-dom";
 import { PATH } from "./path-constants";
-import { PrivateLayout } from "@/layouts/private-layout";
-import DashboardPage from "@/pages/dashboard";
-import Customers from "@/pages/customer";
-import Products from "@/pages/products";
-import Settings from "@/components/settings";
 
 export const PrivateRoutes: RouteObject[] = [
   {

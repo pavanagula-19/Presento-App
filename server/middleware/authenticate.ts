@@ -2,11 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { AuthenticatedRequest, AuthenticatedUser } from "../config/types";
 
-export const authenticate = (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): void => {
+export const authenticate = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
 
   if (!token) {

@@ -49,7 +49,7 @@ import {
 import {
   deleteNoteRequest,
   fetchNotesRequest,
-  updateNoteRequest,
+  updateWishlistRequest,
 } from "@/redux/slices/note-slice";
 import { selectUserInfo } from "@/redux/selectors/user-selector";
 import { createSharedNoteRequest } from "@/redux/slices/share-note-slice";
@@ -77,11 +77,13 @@ export default function ViewNotes() {
   const error = useSelector(selectNoteError);
   const user = useSelector(selectUserInfo);
 
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [selectedNote, setSelectedNote] = useState<Notes | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+
 
   const [showSharePopover, setShowSharePopover] = useState(false);
   const [noteToShare, setNoteToShare] = useState<string | null>(null);
@@ -156,11 +158,11 @@ export default function ViewNotes() {
     {
       accessorKey: "subject",
       header: ({ column }) => (
-        <Button
+        <div
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Subject
-        </Button>
+        </div>
       ),
       cell: ({ row }) => (
         <div className="lowercase">{row.getValue("subject")}</div>
@@ -171,14 +173,12 @@ export default function ViewNotes() {
       header: () => <div className="text-right">Wishlist</div>,
       cell: ({ row }) => {
         const isWishlist = row.original.wishlist;
-
         const toggleWishlist = () => {
-          const updatedWishlistStatus = !isWishlist;
-
+          console.log(isWishlist)
           dispatch(
-            updateNoteRequest({
+            updateWishlistRequest({
               _id: row.original._id,
-              wishlist: updatedWishlistStatus,
+              wishlist: isWishlist?false :true,
               title: row.original.title,
               subject: row.original.subject,
               content: row.original.content,
@@ -188,12 +188,12 @@ export default function ViewNotes() {
 
         return (
           <div className="text-right">
-            <Button  onClick={toggleWishlist}>
+            <Button className="bg-white hover:bg-white" onClick={toggleWishlist}>
               {isWishlist ? (
                 <Star className="text-yellow-500" />
               ) : (
                 <StarOff
-                  className="text-white"
+                  className="text-black"
                 />
               )}
             </Button>
@@ -204,54 +204,51 @@ export default function ViewNotes() {
 
     {
       id: "actions",
+      header: "Actions",
       enableHiding: false,
       cell: ({ row }) => {
         const note = row.original;
-
+    
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button className="h-8 w-8 p-0">
-                <MoreHorizontal
-                  className="text-white"
-                />
+              <Button className="h-8 w-8 p-0 bg-gray-200 hover:bg-gray-300 focus:ring-2 focus:ring-gray-400">
+                <MoreHorizontal className="text-black" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
+            <DropdownMenuContent align="end" className="bg-white shadow-md rounded-md">
+              <DropdownMenuLabel className="text-gray-700">Actions</DropdownMenuLabel>
+    
               <Popover>
-                <PopoverTrigger asChild>
-                  <Button className="w-full text-left">
-                    <Share
-                      className="mr-2"
-                    />
-                    Share Notes
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-64 p-4">
-                  <SharePopover
-                    noteId={note._id}
-                    onClose={() => setNoteToShare(null)}
-                    onShare={handleShare}
-                  />
-                </PopoverContent>
-              </Popover>
-
-              <DropdownMenuItem onClick={() => setSelectedNote(note)}>
-                <Ellipsis
-                />
+  <PopoverTrigger asChild>
+    <Button className="w-full text-left text-black bg-white hover:bg-gray-100 focus:ring-2 focus:ring-gray-300">
+      <Share className="mr-2" />
+      Share Notes
+    </Button>
+  </PopoverTrigger>
+  <PopoverContent className="w-64 p-4 bg-white border border-gray-300 shadow-lg rounded-md z-50">
+    <SharePopover
+      noteId={note._id}
+      onClose={() => setNoteToShare(null)}
+      onShare={handleShare}
+    />
+  </PopoverContent>
+</Popover>
+              <DropdownMenuItem
+                onClick={() => setSelectedNote(note)}
+                className="hover:bg-gray-100 text-gray-700 cursor-pointer flex items-center gap-2 p-2 rounded-md"
+              >
+                <Ellipsis />
                 <span>View details</span>
               </DropdownMenuItem>
-
+    
               <DropdownMenuSeparator />
-
+    
               <DropdownMenuItem
-                className="text-red-500"
+                className="text-red-500 hover:bg-red-100 cursor-pointer flex items-center gap-2 p-2 rounded-md"
                 onClick={() => handleDelete(note._id)}
               >
-                <Trash2
-                />
+                <Trash2 />
                 Delete Notes
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -259,6 +256,7 @@ export default function ViewNotes() {
         );
       },
     },
+    
   ];
 
   const table = useReactTable({

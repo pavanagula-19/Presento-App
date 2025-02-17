@@ -1,4 +1,6 @@
 import { takeLatest, call, put } from "redux-saga/effects";
+import axios, { AxiosResponse } from "axios";
+import { PayloadAction } from "@reduxjs/toolkit";
 import {
   fetchNotesRequest,
   fetchNotesSuccess,
@@ -12,9 +14,10 @@ import {
   deleteNoteRequest,
   deleteNoteSuccess,
   deleteNoteFailure,
+  updateWishlistRequest,
+  updateWishlistSuccess,
+  updateWishlistFailure,
 } from "../slices/note-slice";
-import axios, { AxiosResponse } from "axios";
-import { PayloadAction } from "@reduxjs/toolkit";
 
 function* fetchNotesSaga({ payload }: PayloadAction<string>) {
   try {
@@ -41,7 +44,7 @@ function* createNoteSaga({ payload }: PayloadAction<any>) {
   }
 }
 
-function* updateNoteSaga({ payload }: PayloadAction<any>) {
+function* updateNoteSaga({ payload }: PayloadAction<{ noteId: string; content: string }>) {
   try {
     const response: AxiosResponse<any> = yield call(
       axios.put,
@@ -51,6 +54,19 @@ function* updateNoteSaga({ payload }: PayloadAction<any>) {
     yield put(updateNoteSuccess(response.data.note));
   } catch (error: any) {
     yield put(updateNoteFailure(error.message));
+  }
+}
+
+function* updateWishlistSaga({ payload }: PayloadAction<any>) {
+  try {
+    const response: AxiosResponse<any> = yield call(
+      axios.put,
+      `http://localhost:8000/api/notes/${payload._id}`,
+      payload
+    );
+    yield put(updateWishlistSuccess(response.data.note));
+  } catch (error: any) {
+    yield put(updateWishlistFailure(error.message));
   }
 }
 
@@ -67,5 +83,6 @@ export default function* noteSagas() {
   yield takeLatest(fetchNotesRequest.type, fetchNotesSaga);
   yield takeLatest(createNoteRequest.type, createNoteSaga);
   yield takeLatest(updateNoteRequest.type, updateNoteSaga);
+  yield takeLatest(updateWishlistRequest.type, updateWishlistSaga);
   yield takeLatest(deleteNoteRequest.type, deleteNoteSaga);
 }

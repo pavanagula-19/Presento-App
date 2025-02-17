@@ -1,70 +1,63 @@
 import { call, put, takeLatest } from "redux-saga/effects";
+import { AxiosResponse } from "axios";
 import apiClient from "../apiClient";
 import {
   fetchSharedNotesRequest,
   fetchSharedNotesSuccess,
   fetchSharedNotesFailure,
+  fetchReceivedNotesRequest,
+  fetchReceivedNotesSuccess,
+  fetchReceivedNotesFailure,
   createSharedNoteRequest,
   createSharedNoteSuccess,
   createSharedNoteFailure,
   deleteSharedNoteRequest,
   deleteSharedNoteSuccess,
   deleteSharedNoteFailure,
+  SharedNote,
 } from "../slices/share-note-slice";
 import { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosResponse } from "axios";
-
-interface CreateSharedNotePayload {
-  noteId: string;
-  sharedWith: string;
-}
-
-interface SharedNote {
-  id: string;
-  noteId: string;
-  sharedWith: string;
-  sharedBy: string;
-  createdAt: Date;
-}
 
 function* fetchSharedNotesSaga() {
   try {
-    const response: AxiosResponse<{ sharedNotes: SharedNote[] }> = yield call(
-      apiClient.get,
-      "/shared/notes"
-    );
+    const response: AxiosResponse<{ sharedNotes: SharedNote[] }> = yield call(apiClient.get, "shared/notes/sent");
+
     yield put(fetchSharedNotesSuccess(response.data.sharedNotes));
   } catch (error: any) {
     yield put(fetchSharedNotesFailure(error?.message));
   }
 }
 
-function* createSharedNoteSaga({
-  payload,
-}: PayloadAction<CreateSharedNotePayload>) {
+function* fetchReceivedNotesSaga() {
   try {
-    const response: AxiosResponse<SharedNote> = yield call(
-      apiClient.post,
-      "/shared/notes",
-      payload
-    );
-    yield put(createSharedNoteSuccess(response.data));
+    const response: AxiosResponse<{ receivedNotes: SharedNote[] }> = yield call(apiClient.get, "/shared/notes/received");
+    yield put(fetchReceivedNotesSuccess(response.data.receivedNotes));
+  } catch (error: any) {
+    yield put(fetchReceivedNotesFailure(error?.message));
+  }
+}
+
+function* createSharedNoteSaga(action: PayloadAction<{ noteId: string; sharedWith: string }>) {
+  try {
+    const response: AxiosResponse<{ sharedNote: SharedNote }> = yield call(apiClient.post, "/shared/notes/", action.payload);
+    yield put(createSharedNoteSuccess(response.data.sharedNote));
   } catch (error: any) {
     yield put(createSharedNoteFailure(error?.message));
   }
 }
 
-function* deleteSharedNoteSaga({ payload }: PayloadAction<string>) {
+function* deleteSharedNoteSaga(action: PayloadAction<string>) {
   try {
-    yield call(apiClient.delete, `/shared/notes/${payload}`);
-    yield put(deleteSharedNoteSuccess(payload));
+    yield call(apiClient.delete, `/shared/notes/${action.payload}`);
+    yield put(deleteSharedNoteSuccess(action.payload));
   } catch (error: any) {
     yield put(deleteSharedNoteFailure(error?.message));
   }
 }
 
-export default function* shareNoteSagas() {
+export default function* watchShareNoteSagas() {
   yield takeLatest(fetchSharedNotesRequest.type, fetchSharedNotesSaga);
+  yield takeLatest(fetchReceivedNotesRequest.type, fetchReceivedNotesSaga);
   yield takeLatest(createSharedNoteRequest.type, createSharedNoteSaga);
   yield takeLatest(deleteSharedNoteRequest.type, deleteSharedNoteSaga);
 }

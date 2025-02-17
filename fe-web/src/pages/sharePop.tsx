@@ -32,7 +32,7 @@ const SharePopover: React.FC<SharePopoverProps> = ({
         onChange={(e) => setEmail(e.target.value)}
       />
       <div className="flex justify-end space-x-2 mt-2">
-        <Button variant="ghost" onClick={onClose}>
+        <Button onClick={onClose}>
           Cancel
         </Button>
         <Button onClick={handleShare}>Share</Button>

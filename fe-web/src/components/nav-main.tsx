@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import { ChevronRight, LayoutGrid, type LucideIcon } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -37,12 +37,23 @@ export function NavMain({
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const handleClickDashboard = ()=>{
+    navigate(PATH.DASHBOARD)
+  }
   return (
     <SidebarGroup>
       <SidebarGroupLabel className="bg-white text-black">
         Platform
       </SidebarGroupLabel>
       <SidebarMenu>
+        <div
+          className="flex items-center gap-3 p-2 rounded-md cursor-pointer transition-all duration-200 bg-white text-black hover:bg-gray-100"
+          onClick={() => navigate(PATH.DASHBOARD)}
+        >
+          <LayoutGrid className="w-5 h-5 text-gray-700" />
+          <span className="text-base font-medium text-gray-900" onClick={handleClickDashboard}>Dashboard</span>
+        </div>
+
         {items.map((item) => (
           <Collapsible
             key={item.title}
@@ -72,7 +83,7 @@ export function NavMain({
                             dispatch(saveCurrentNoteId(undefined));
                           navigate(subItem?.url);
                         }}
-                        className="flex items-center w-full p-2 rounded-md transition-colors duration-200 bg-gray-200 text-black hover:bg-gray-300"
+                        className="flex items-center w-full p-2 rounded-md transition-colors duration-200  text-black hover:bg-gray-200"
                       >
                         <span>{subItem.title}</span>
                       </SidebarMenuSubButton>

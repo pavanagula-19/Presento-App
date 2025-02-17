@@ -29,18 +29,23 @@ export default function NoteDetail({ note, onClose }: NoteDetailProps) {
   };
 
   return (
-    <div className="note-detail">
-      <button onClick={onClose}>Close</button>
-      <Button
-        onClick={() => {
-          dispatch(saveCurrentNoteId(note?._id));
-          navigate(PATH.CREATENOTES);
-        }}
-      >
-        Edit
-      </Button>
-      <h2>{note.title}</h2>
-      <ReactQuill value={content} onChange={handleContentChange} />
+    <div className="note-detail relative p-4 border rounded-lg shadow-md bg-white">
+      <div className="absolute top-4 right-4 flex space-x-4">
+        <button className="bg-gray-200 px-4 py-2 rounded" onClick={onClose}>
+          Close
+        </button>
+        <Button
+          onClick={() => {
+            dispatch(saveCurrentNoteId(note?._id));
+            navigate(PATH.CREATENOTES);
+          }}
+        >
+          Edit
+        </Button>
+      </div>
+
+      <h2 className="mt-12 text-xl font-semibold">{note.title}</h2>
+      <ReactQuill value={content} onChange={handleContentChange} className="mt-4" />
     </div>
   );
 }

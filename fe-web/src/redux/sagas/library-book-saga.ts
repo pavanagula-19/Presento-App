@@ -18,51 +18,54 @@ import {
   toggleWishlistFailure,
 } from "../slices/library-book-slice";
 
+const BASE_URL = "http://localhost:8000/api/library/books/";
+
 function* fetchBooksSaga() {
   try {
-    const response: AxiosResponse<any> = yield call(axios.get, "http://localhost:8000/api/library/books/");
+    const response: AxiosResponse<any> = yield call(axios.get, BASE_URL);
     yield put(fetchBooksSuccess(response.data));
   } catch (error: any) {
-    yield put(fetchBooksFailure(error.message));
+    yield put(fetchBooksFailure(error?.response?.data?.message || error.message));
   }
 }
 
 function* addBookSaga(action: ReturnType<typeof addBookRequest>) {
   try {
-    const response: AxiosResponse<any> = yield call(axios.post, "http://localhost:8000/api/library/books/", action.payload);
+    const response: AxiosResponse<any> = yield call(axios.post, BASE_URL, action.payload);
     yield put(addBookSuccess(response.data));
   } catch (error: any) {
-    yield put(addBookFailure(error.message));
+    yield put(addBookFailure(error?.response?.data?.message || error.message));
   }
 }
 
 function* updateBookSaga(action: ReturnType<typeof updateBookRequest>) {
   try {
-    const response: AxiosResponse<any> = yield call(axios.put, `http://localhost:8000/api/library/books/${action.payload.id}`, action.payload);
+    const response: AxiosResponse<any> = yield call(axios.put, `${BASE_URL}${action.payload._id}`, action.payload);
     yield put(updateBookSuccess(response.data));
   } catch (error: any) {
-    yield put(updateBookFailure(error.message));
+    yield put(updateBookFailure(error?.response?.data?.message || error.message));
   }
 }
 
 function* deleteBookSaga(action: ReturnType<typeof deleteBookRequest>) {
   try {
-    yield call(axios.delete, `http://localhost:8000/api/library/books/${action.payload}`);
+    yield call(axios.delete, `${BASE_URL}${action.payload}`);
     yield put(deleteBookSuccess(action.payload));
   } catch (error: any) {
-    yield put(deleteBookFailure(error.message));
+    yield put(deleteBookFailure(error?.response?.data?.message || error.message));
   }
 }
+
 function* toggleWishlistSaga(action: ReturnType<typeof toggleWishlistRequest>) {
   try {
     const response: AxiosResponse<any> = yield call(
-      axios.patch, 
-      `http://localhost:8000/api/library/books/${action.payload.id}/wishlist`,
-      { wishlist: action.payload.wishlist } 
+      axios.patch,
+      `${BASE_URL}${action.payload.id}/wishlist`,
+      { wishlist: action.payload.wishlist,userId:action.payload.userId }
     );
     yield put(toggleWishlistSuccess(response.data));
   } catch (error: any) {
-    yield put(toggleWishlistFailure(error.message));
+    yield put(toggleWishlistFailure(error?.response?.data?.message || "An error occurred"));
   }
 }
 

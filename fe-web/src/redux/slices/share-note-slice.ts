@@ -1,30 +1,29 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface SharedNote {
-  id: string;
+  _id: string;
   noteId: string;
   sharedWith: string;
   sharedBy: string;
-  createdAt: Date;
+  createdAt: string;
 }
-interface CreateSharedNotePayload {
-  noteId: string;
-  sharedWith: string;
-}
-interface SharedNoteState {
+
+interface ShareNoteState {
   sharedNotes: SharedNote[];
+  receivedNotes: SharedNote[];
   loading: boolean;
   error: string | null;
 }
 
-const initialState: SharedNoteState = {
+const initialState: ShareNoteState = {
   sharedNotes: [],
+  receivedNotes: [],
   loading: false,
   error: null,
 };
 
 const shareNoteSlice = createSlice({
-  name: "sharedNote",
+  name: "shareNote",
   initialState,
   reducers: {
     fetchSharedNotesRequest(state) {
@@ -39,7 +38,21 @@ const shareNoteSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    createSharedNoteRequest(state, _action: PayloadAction<CreateSharedNotePayload>) {
+
+    fetchReceivedNotesRequest(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchReceivedNotesSuccess(state, action: PayloadAction<SharedNote[]>) {
+      state.receivedNotes = action.payload;
+      state.loading = false;
+    },
+    fetchReceivedNotesFailure(state, action: PayloadAction<string>) {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    createSharedNoteRequest(state,_action:PayloadAction<any>) {
       state.loading = true;
       state.error = null;
     },
@@ -51,14 +64,14 @@ const shareNoteSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    deleteSharedNoteRequest(state, _action: PayloadAction<string>) {
+
+    deleteSharedNoteRequest(state) {
       state.loading = true;
       state.error = null;
     },
     deleteSharedNoteSuccess(state, action: PayloadAction<string>) {
-      state.sharedNotes = state.sharedNotes.filter(
-        (note) => note.id !== action.payload
-      );
+      state.sharedNotes = state.sharedNotes.filter(note => note._id !== action.payload);
+      state.receivedNotes = state.receivedNotes.filter(note => note._id !== action.payload);
       state.loading = false;
     },
     deleteSharedNoteFailure(state, action: PayloadAction<string>) {
@@ -72,6 +85,9 @@ export const {
   fetchSharedNotesRequest,
   fetchSharedNotesSuccess,
   fetchSharedNotesFailure,
+  fetchReceivedNotesRequest,
+  fetchReceivedNotesSuccess,
+  fetchReceivedNotesFailure,
   createSharedNoteRequest,
   createSharedNoteSuccess,
   createSharedNoteFailure,

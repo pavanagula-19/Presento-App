@@ -1,5 +1,7 @@
 import { RootState } from "../store";
 
 export const selectSharedNotes = (state: RootState) => state.sharedNote.sharedNotes;
-export const selectSharedNoteLoading = (state: RootState) => state.sharedNote.loading;
-export const selectSharedNoteError = (state: RootState) => state.sharedNote.error;
+export const selectReceivedNotes = (state: RootState) => state.sharedNote.receivedNotes;
+export const selectShareNoteLoading = (state: RootState) => state.sharedNote.loading;
+export const selectShareNoteError = (state: RootState) => state.sharedNote.error;
+

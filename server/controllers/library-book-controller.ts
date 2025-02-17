@@ -1,8 +1,5 @@
-import { Request, Response, NextFunction } from "express";
 import Book from "../models/library-book-schema";
-
-
-
+import { Request, Response, NextFunction } from "express";
 
 export const updateWishlist = async (
   req: Request,
@@ -10,24 +7,41 @@ export const updateWishlist = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { wishlist } = req.body; 
+    const { userId, wishlist } = req.body;
+    console.log(req.params)
+    const {  bookId } = req.params; 
 
-    const updatedBook = await Book.findByIdAndUpdate(
-      req.params.id,
-      { wishlist },
-      { new: true, runValidators: true } 
-    );
+    if (!userId) {
+      res.status(400).json({ message: "User ID is required" });
+      return;
+    }
 
-    if (!updatedBook) {
+    const book = await Book.findById(bookId);
+    if (!book) {
       res.status(404).json({ message: "Book not found" });
       return;
     }
 
-    res.json(updatedBook); 
+    const userWishlist = book.wishlist.find((item) => item.user.toString() === userId);
+
+    if (userWishlist) {
+      userWishlist.added = wishlist;
+    } else {
+      book.wishlist.push({ user: userId, added: wishlist });
+    }
+
+    await book.save();
+
+    res.status(200).json({
+      message: "Wishlist updated successfully",
+      book,
+    });
   } catch (error) {
     next(error); 
   }
 };
+
+
 
 export const getAllBooks = async (
   req: Request,

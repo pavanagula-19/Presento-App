@@ -1,29 +1,31 @@
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { fetchBooksRequest } from "../redux/slices/library-book-slice";
+import CustomPagination from "@/components/CustomPagination";
 import { Button } from "@/components/ui/button";
 import { Popover } from "@/components/ui/popover";
-import { Filter, Star } from "lucide-react";
-import CustomPagination from "@/components/CustomPagination";
 import {
   selectBooks,
   selectBooksError,
-  selectBooksLoading,
+  selectBooksLoading
 } from "@/redux/selectors/library-book-selector";
+import { selectUserInfo } from "@/redux/selectors/user-selector";
 import { PATH } from "@/routes";
+import { Filter, Star } from "lucide-react";
+import { useEffect, useState } from "react";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { fetchBooksRequest, toggleWishlistRequest } from "../redux/slices/library-book-slice";
 
 export default function LibraryBooksSearch() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const books = useSelector(selectBooks);
+  // const wishlist = useSelector(selectWishlist);
+  console.log(books,'lllllllllllllllllllllllllllll')
   const loading = useSelector(selectBooksLoading);
   const error = useSelector(selectBooksError);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [wishlist, setWishlist] = useState<string[]>([]);
+const userDetails = useSelector(selectUserInfo,shallowEqual)
   const [searchQuery, setSearchQuery] = useState("");
   const booksPerPage = 4;
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     dispatch(fetchBooksRequest());
@@ -33,12 +35,10 @@ export default function LibraryBooksSearch() {
     setCurrentPage(pageNumber);
   };
 
-  const toggleWishlist = (title: string) => {
-    setWishlist((prevWishlist) =>
-      prevWishlist.includes(title)
-        ? prevWishlist.filter((item) => item !== title)
-        : [...prevWishlist, title]
-    );
+  const toggleWishlist = (book: { _id: string; title: string ,wishlist:boolean}) => {
+    if(userDetails){
+      dispatch(toggleWishlistRequest({ id: book._id, wishlist:  !book.wishlist,userId:userDetails?.id }));
+    }
   };
 
   const openBook = (bookUrl: string) => {
@@ -84,8 +84,8 @@ export default function LibraryBooksSearch() {
             </tr>
           </thead>
           <tbody>
-            {currentBooks.map((book, index) => (
-              <tr key={index} className="hover:bg-gray-100">
+            {currentBooks.map((book) => (
+              <tr key={book._id} className="hover:bg-gray-100">
                 <td className="py-2 px-4 border-b text-center">
                   <img
                     src={book.imageUrl}
@@ -101,11 +101,11 @@ export default function LibraryBooksSearch() {
                       Read
                     </Button>
                     <button
-                      onClick={() => toggleWishlist(book.title)}
+                      onClick={() => toggleWishlist(book)}
                       className="bg-transparent"
                     >
                       <Star
-                        className={`w-6 h-6 ${wishlist.includes(book.title) ? "text-yellow-500" : "text-gray-400"}`}
+                        className={`w-6 h-6 ${book.wishlist ? "text-yellow-500" : "text-gray-400"}`}
                       />
                     </button>
                   </div>

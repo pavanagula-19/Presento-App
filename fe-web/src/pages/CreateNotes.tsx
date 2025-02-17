@@ -10,6 +10,7 @@ import {
 } from "../redux/slices/note-slice";
 import { selectUserInfo } from "../redux/selectors/user-selector";
 import { selectNodeId, selectNote } from "@/redux/selectors/note-selector";
+import { Button } from "@/components/ui/button";
 
 Quill.register("modules/imageResize", ImageResize);
 
@@ -23,8 +24,7 @@ const TextEditor: React.FC = () => {
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showFloatingToolbar, setShowFloatingToolbar] = useState(false);
-  const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+
 
   useEffect(() => {
     if (!user?.id) return;
@@ -98,20 +98,26 @@ const TextEditor: React.FC = () => {
 
   return (
     <div className="relative w-full bg-white text-black">
-      <div className="ql-toolbar ql-snow sticky top-0 z-10 border-b shadow-sm px-4 py-2 flex items-center justify-between bg-white border-gray-300">
-        <input
-          type="text"
-          placeholder="Document Title"
-          className="border-none outline-none text-lg font-semibold w-1/2 bg-white text-black"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <button onClick={() => setIsModalOpen(true)} className="px-4 py-2 rounded-md bg-black text-white">
-          Save
-        </button>
-      </div>
+    <div className="ql-toolbar ql-snow sticky top-0 z-10 border-b shadow-sm px-4 py-2 flex items-center justify-between bg-white border-gray-300">
+      <input
+        type="text"
+        placeholder="Document Title"
+        className="border-none outline-none text-lg font-semibold w-1/2 bg-white text-black"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      
+      <Button
+  onClick={() => setIsModalOpen(true)}
+  className=" px-6 py-2 rounded-lg bg-gray-900 text-black hover:bg-gray-800 transition"
+>
+  Save
+</Button>
 
-      <div ref={quillRef} className="w-full px-10 pt-16 pb-20 bg-white text-black" style={{ minHeight: "100vh" }}></div>
+    </div>
+  
+    <div ref={quillRef} className="w-full px-10 pt-16 pb-20 bg-white text-black" style={{ minHeight: "100vh" }}></div>
+  
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -131,14 +137,20 @@ const TextEditor: React.FC = () => {
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
             />
-            <div className="flex justify-end">
-              <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 mr-2 border rounded-md border-gray-300 text-black">
-                Cancel
-              </button>
-              <button onClick={handleSave} className="px-4 py-2 rounded-md bg-black text-white">
-                Save
-              </button>
-            </div>
+           <div className="flex justify-end space-x-2">
+  <button
+    onClick={() => setIsModalOpen(false)}
+    className="px-4 py-2 border rounded-md border-gray-300 text-black bg-white hover:bg-gray-100 transition"
+  >
+    Cancel
+  </button>
+  <button
+    onClick={handleSave}
+    className="px-4 py-2 rounded-md bg-gray-900 text-white hover:bg-gray-800 transition"
+  >
+    Save
+  </button>
+</div>
           </div>
         </div>
       )}

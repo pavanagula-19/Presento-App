@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   ColumnDef,
@@ -28,27 +28,28 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { fetchSharedNotesRequest } from "@/redux/slices/share-note-slice";
-import { fetchNotesRequest } from "@/redux/slices/note-slice"; // Fetch all notes
+import { fetchReceivedNotesRequest } from "@/redux/slices/share-note-slice";
+import { fetchNotesRequest } from "@/redux/slices/note-slice"; 
 import {
-  selectSharedNotes,
-  selectSharedNoteLoading,
-  selectSharedNoteError,
+  selectReceivedNotes,
+  selectShareNoteLoading,
+  selectShareNoteError,
 } from "@/redux/selectors/share-note-selector";
 import { selectUserInfo } from "@/redux/selectors/user-selector";
-import { selectNotes } from "@/redux/selectors/note-selector"; // Selector for notes
+import { selectNotes } from "@/redux/selectors/note-selector"; 
 
 export default function SharedNotes() {
   const dispatch = useDispatch();
-  const sharedNotes = useSelector(selectSharedNotes);
+  const sharedNotes = useSelector(selectReceivedNotes);
+  console.log(sharedNotes,'llllllllllllllllll')
   const notes = useSelector(selectNotes);
-  const loading = useSelector(selectSharedNoteLoading);
-  const error = useSelector(selectSharedNoteError);
+  const loading = useSelector(selectShareNoteLoading);
+  const error = useSelector(selectShareNoteError);
   const user = useSelector(selectUserInfo);
 
   useEffect(() => {
-    if (user?._id) {
-      dispatch(fetchSharedNotesRequest(user._id));
+    if (user?.id) {
+      dispatch(fetchReceivedNotesRequest(user._id));
     }
   }, [dispatch, user]);
 
@@ -58,10 +59,6 @@ export default function SharedNotes() {
     }
   }, [dispatch, sharedNotes, user]);
 
-  const getNoteTitle = (noteId: string) => {
-    const note = notes.find((n) => n._id === noteId);
-    return note ? note.title : "Untitled";
-  };
 
   const columns: ColumnDef<any>[] = [
     {
@@ -74,14 +71,14 @@ export default function SharedNotes() {
       header: "Title",
       cell: ({ row }) => (
         <div className="cursor-pointer">
-          {getNoteTitle(row.original.noteId)}
+          {(row.original.noteId?.title)}
         </div>
       ),
     },
     {
       accessorKey: "sharedBy",
       header: "Shared By",
-      cell: ({ row }) => <div>{row.getValue("sharedBy")}</div>,
+      cell: ({ row }) => <div>{row.original.sharedBy}</div>,
     },
     {
       id: "actions",
@@ -97,15 +94,15 @@ export default function SharedNotes() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(note.id)}
+                onClick={() => navigator.clipboard.writeText(note.noteId)}
               >
-                <Share />
-                Share Notes
+                <Share className="mr-2" />
+                Copy Note ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-red-500">
-                <Trash2 />
-                Delete Notes
+                <Trash2 className="mr-2" />
+                Delete Note
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -115,7 +112,7 @@ export default function SharedNotes() {
   ];
 
   const table = useReactTable({
-    data: sharedNotes,
+    data: sharedNotes || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

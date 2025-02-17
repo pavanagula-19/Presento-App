@@ -5,7 +5,6 @@ import {
   LibraryBig,
   Settings2,
   SquareTerminal,
-  LayoutGrid,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -23,10 +22,6 @@ import { useNavigate } from "react-router-dom";
 
 const data = {
   navMain: [
-    {
-      title: "Dashboard",
-      icon: LayoutGrid,
-    },
     {
       title: "Notes",
       icon: SquareTerminal,
@@ -119,6 +114,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </header>
         <SidebarContent>
           <ScrollArea className="h-[90vh] max-h-[90vh] bg-white">
+
             <NavMain items={data.navMain} />
           </ScrollArea>
         </SidebarContent>

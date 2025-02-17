@@ -6,34 +6,32 @@ import { selectNotes } from "@/redux/selectors/note-selector";
 import { fetchNotesRequest } from "@/redux/slices/note-slice";
 
 export default function Dashboard() {
-  const dispatch = useDispatch();
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
-  
+  const dispatch = useDispatch();  
   const user = useSelector(selectUserInfo);
   const notes = useSelector(selectNotes);
-console.log(notes)
+
   React.useEffect(() => {
     if (user?._id) {
       dispatch(fetchNotesRequest(user._id));
     }
   }, [dispatch, user]);
-  
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen w-full bg-gray-100">
       <aside className="w-1/4 bg-white p-4 shadow-md overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-black">Recent Notes</h2>
         </div>
         <div className="space-y-4">
           {notes?.length > 0 ? (
-            notes.map((note) => (
-              <div key={note._id} className="p-4 bg-gray-200 rounded-lg">
-                <h3 className="font-semibold">{note.title}</h3>
-
-                <span className="text-xs text-gray-500">{note.date}</span>
-              </div>
-            ))
+            notes
+              .slice(0, 5) 
+              .map((note) => (
+                <div key={note._id} className="p-4 bg-gray-200 rounded-lg">
+                  <h3 className="font-semibold">{note.title}</h3>
+                  <span className="text-xs text-gray-500">{note.date}</span>
+                </div>
+              ))
           ) : (
             <p className="text-gray-500">No notes available</p>
           )}
@@ -85,3 +83,4 @@ console.log(notes)
     </div>
   );
 }
+

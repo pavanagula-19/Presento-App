@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../store";
 
 interface NoteState {
   notes: any[];
@@ -72,6 +71,23 @@ const noteSlice = createSlice({
     saveCurrentNoteId(state, action: PayloadAction<string | undefined>) {
       return { ...state, noteId: action.payload };
     },
+    // New actions for wishlist
+    updateWishlistRequest: (state, _action: PayloadAction<any>) => {
+      state.loading = true;
+    },
+    updateWishlistSuccess: (state, action: PayloadAction<any>) => {
+      state.loading = false;
+      const index = state.notes.findIndex(
+        (note) => note._id === action.payload?._id
+      );
+      if (index !== -1) {
+        state.notes[index] = action.payload;
+      }
+    },
+    updateWishlistFailure: (state, action: PayloadAction<string>) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
   },
 });
 
@@ -89,6 +105,9 @@ export const {
   deleteNoteSuccess,
   deleteNoteFailure,
   saveCurrentNoteId,
+  updateWishlistRequest,
+  updateWishlistSuccess,
+  updateWishlistFailure,
 } = noteSlice.actions;
 
 export default noteSlice.reducer;

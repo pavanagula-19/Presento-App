@@ -10,9 +10,13 @@ import {
 const router: Router = express.Router();
 
 router.get("/", getAllBooks);
+
 router.post("/", createBook);
-router.put("/:id", updateBook);
-router.patch("/:id/wishlist", updateWishlist);
-router.delete("/:id", deleteBook);
+
+router.put("/:bookId", updateBook);
+
+router.patch("/:bookId/wishlist", updateWishlist);
+
+router.delete("/:bookId", deleteBook);
 
 export default router;
