@@ -1,5 +1,6 @@
 export const PATH = {
-  LOGIN: "/",
+  LOGIN: "/login",
+  LANDINGPAGE: "/",
   REGISTRATION: "/register",
   DASHBOARD: "/dashboard",
   CREATENOTES: "/create-notes",
